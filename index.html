@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>יפן דצמבר 2026</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Noto+Sans+JP:wght@500;700&display=swap">
+
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}[hidden]{display:none!important}
+.logo{width:22px;height:22px;border-radius:50%;background:#d6262b;display:inline-block;vertical-align:-3px;margin-inline-end:10px}
+.tools{display:flex;gap:16px;margin-top:12px}
+.tools button{background:none;border:0;padding:0;color:#3d5a80;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+<style>
+/* Layout: one quiet white column; the trip as an accordion of stages; each stage is a checklist, finished stages fold away and the next one is lifted */
+:root{
+  --bg:#ffffff; --fg:#1d1f22; --muted:#73777d; --rule:#ececea; --soft:#f6f6f4; --next:#f2f5f9; --accent:#3d5a80; --done:#5f8f6d; --warn:#9a4f28; --warn-bg:#fbf5f1;
+  --f:"Assistant",system-ui,"Segoe UI",Arial,sans-serif;
+  --jp:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f);font-size:16px;line-height:1.6;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:600px;margin:0 auto}
+a{color:var(--accent)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{padding-block:32px 20px}
+h1{font-size:26px;font-weight:700;margin:0;letter-spacing:-.01em}
+.meta{color:var(--muted);font-size:14px;margin-top:2px}
+.times{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:14px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.times b{color:var(--fg);font-weight:600}
+
+.acc{border-top:1px solid var(--rule)}
+.st{border-bottom:1px solid var(--rule);transition:background .25s}
+.head{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:baseline;width:100%;background:none;border:0;padding:18px 0;text-align:start}
+.num{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.head .t{font-size:18px;font-weight:700;line-height:1.3}
+.head .d{font-size:14px;color:var(--muted)}
+.tag{font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.chev{display:inline-block;transition:transform .2s;margin-inline-start:8px}
+.st.open .chev{transform:rotate(-90deg)}
+
+.st.done .num,.st.done .tag{color:var(--done)}
+.st.done .head .t{color:var(--muted);font-weight:600}
+.st.next{background:var(--next);border-radius:10px;border-bottom-color:transparent;margin-block:6px;box-shadow:inset -3px 0 0 var(--accent)}
+.st.next .head{padding-inline:14px}
+.st.next .body{padding-inline:14px 54px}
+.st.next .num,.st.next .tag{color:var(--accent);font-weight:700}
+.body{padding:0 40px 22px 0;display:grid;gap:14px}
+
+h3{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin:6px 0 0}
+ul.chk{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+ul.chk li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;padding:5px 0}
+ul.chk input{accent-color:var(--done);width:20px;height:20px;margin:3px 0 0;cursor:pointer}
+ul.chk li.ck .txt{color:var(--muted)}
+ul.chk li.ck .txt .lbl{text-decoration:line-through}
+.txt label{cursor:pointer}
+.dur{color:var(--muted);font-size:14px}
+.jp{font-family:var(--jp);font-weight:500}
+.big{font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.sub{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:16px;font-size:15px}
+.warn{font-size:14px;color:var(--warn);background:var(--warn-bg);padding:8px 12px;border-radius:6px}
+.key{font-size:15px;background:var(--soft);padding:10px 12px;border-radius:6px}
+.show{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-size:15px;white-space:nowrap}
+dl.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:15px}
+dl.facts dt{color:var(--muted)}
+dl.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.n{font-variant-numeric:tabular-nums}
+textarea{width:100%;min-height:64px;background:var(--soft);color:var(--fg);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;font:inherit;font-size:15px;resize:vertical}
+ul.plain{margin:0;padding-inline-start:18px;display:grid;gap:4px;font-size:15px}
+.cards{display:grid;gap:8px}
+.card{display:block;width:100%;text-align:start;background:var(--bg);border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
+.card:hover{border-color:var(--accent)}
+.card .he{font-size:14px;color:var(--muted)}
+.card .ja{font-family:var(--jp);font-weight:700;font-size:20px;line-height:1.45;direction:ltr;text-align:right}
+.card .ro{font-size:14px;color:var(--muted)}
+.card .addr{font-size:13px;color:var(--muted);direction:ltr;text-align:right;font-family:var(--jp)}
+.reset{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:13px}
+
+#full{position:fixed;inset:0;background:#fff;color:#111;z-index:20;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px));text-align:center}
+#full .ja{font-family:var(--jp);font-weight:700;font-size:clamp(30px,8.5vw,56px);line-height:1.4;direction:ltr}
+#full .addr{font-family:var(--jp);font-size:clamp(17px,4.5vw,24px);color:#444;direction:ltr}
+#full .he{font-size:15px;color:#777}
+#full button{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));inset-inline-start:max(14px,env(safe-area-inset-left,0px));background:#f0f0ee;border:0;border-radius:99px;padding:6px 14px;font-size:15px}
+footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <h1><span class="logo" aria-hidden="true"></span>יפן · דצמבר 2026</h1>
+  <div class="meta">ברק ועמית · כנס נפילות בטוחות, אוניברסיטת טוקאי</div>
+  <div class="tools"><button id="shareBtn">שיתוף</button><button id="installBtn" hidden>התקנה בטלפון</button></div>
+  <div class="times"><span>ישראל <b id="cIL">--:--</b></span><span>יפן <b id="cJP">--:--</b></span><span id="cd"></span></div>
+</header>
+<div class="acc" id="acc"></div>
+<footer>
+  <span>הסימונים וההערות נשמרים בטלפון הזה בלבד. זמני הנסיעה משוערים; ביום עצמו כדאי לבדוק בגוגל מפות.</span>
+  <span><button class="reset" id="reset">לנקות את כל הסימונים</button> <span id="resetAsk" hidden> · בטוח? <button class="reset" id="resetYes">כן, לנקות</button></span></span>
+</footer>
+</div>
+
+<div id="full" hidden role="dialog" aria-modal="true">
+  <button id="close">סגור</button>
+  <div class="ja" id="fJa"></div>
+  <div class="addr" id="fAddr"></div>
+  <div class="he" id="fHe"></div>
+</div>
+
+<script>
+const CARDS={
+ lost:{he:"הלכנו לאיבוד, אפשר עזרה?",ja:"道に迷いました。\n助けていただけますか？",ro:"מיצ׳י ני מאיוֹאימשיטה. טסקֶטֶה איטדקֶמס קא?"},
+ jrdesk:{he:"איפה הקופה של JR / נריטה אקספרס?",ja:"JRのきっぷ売り場は\nどこですか？\n成田エクスプレス",ro:"ג׳יי־אר נו קיפּו אוּריבה וָה דוֹקוֹ דֶס קא? נריטה אֶקסופּורֶסו"},
+ nex:{he:"כרטיס נריטה אקספרס לשינג׳וקו, שני אנשים",ja:"成田エクスプレスで\n新宿まで、大人2枚\nお願いします",ro:"נריטה אֶקסופּורֶסו דֶה שינג׳וקו מאדֶה, אוֹטוֹנה ני־מאי אוֹנֶגאישימס"},
+ nexplat:{he:"איפה הרציף של נריטה אקספרס?",ja:"成田エクスプレスの\n乗り場はどこですか？",ro:"נריטה אֶקסופּורֶסו נו נוֹריבה וָה דוֹקוֹ דֶס קא?"},
+ odakyu:{he:"איפה הרציף של קו אודקיו?",ja:"小田急線の乗り場は\nどこですか？",ro:"אודקיו־סֶן נו נוֹריבה וָה דוֹקוֹ דֶס קא?"},
+ tsuru:{he:"אנחנו רוצים להגיע לתחנת צורומקי אונסן",ja:"鶴巻温泉駅まで\n行きたいです",ro:"צורומאקי אונסן אֶקי מאדֶה איקיטאי דֶס"},
+ stoptsuru:{he:"הרכבת הזאת עוצרת בצורומקי אונסן?",ja:"この電車は\n鶴巻温泉に止まりますか？",ro:"קוֹנוֹ דֶנשה וָה צורומאקי אונסן ני טוֹמרימס קא?"},
+ campus:{he:"לקמפוס אוניברסיטת טוקאי, בניין 15",ja:"東海大学 湘南キャンパス\n15号館まで\nお願いします",addr:"神奈川県平塚市北金目4-1-1",ro:"טוֹקאי דאיגקו שוֹנאן קיאנפּסו, ג׳וּגוֹ־גוֹקאן מאדֶה אוֹנֶגאישימס"},
+ bldg:{he:"איפה בניין 15? איפה הבודוקאן?",ja:"15号館はどこですか？\n武道館はどこですか？",ro:"ג׳וּגוֹ־גוֹקאן וָה דוֹקוֹ דֶס קא? בּוּדוֹקאן וָה דוֹקוֹ דֶס קא?"},
+ tokaist:{he:"לתחנת טוקאי־דאיגקומאה, בבקשה",ja:"東海大学前駅まで\nお願いします",ro:"טוֹקאי־דאיגקומאֶה אֶקי מאדֶה אוֹנֶגאישימס"},
+ nexback:{he:"כרטיס נריטה אקספרס לנריטה טרמינל 1, שני אנשים",ja:"成田エクスプレスで\n成田空港 第1ターミナルまで\n大人2枚お願いします",ro:"נריטה קוּקוֹ דאי־איצ׳י טָמינרו מאדֶה, אוֹטוֹנה ני־מאי אוֹנֶגאישימס"},
+ airport:{he:"הרכבת הזאת נוסעת לנמל התעופה נריטה?",ja:"この電車は\n成田空港に行きますか？",ro:"קוֹנוֹ דֶנשה וָה נריטה קוּקוֹ ני איקימס קא?"},
+ english:{he:"אתם מדברים אנגלית?",ja:"英語を話せますか？",ro:"אֵייגוֹ אוֹ הנסֶמס קא?"},
+ write:{he:"אפשר לכתוב את זה?",ja:"ここに書いて\nいただけますか？",ro:"קוֹקוֹ ני קאיטֶה איטדקֶמס קא?"},
+ help:{he:"חירום: בבקשה תזמינו אמבולנס",ja:"救急車を\n呼んでください",addr:"119",ro:"קיוּקיוּשה אוֹ יוֹנדֶה קודסאי"}
+};
+const sh=(id,label)=>`<button class="show" data-card="${id}">${label||"להראות"}</button>`;
+/* checklist: each item is [label, extra html] or a plain string */
+const chk=(pre,items)=>`<ul class="chk">${items.map((x,i)=>{const [l,ex]=Array.isArray(x)?x:[x,""];
+  return `<li><input type="checkbox" id="c-${pre}-${i}" data-k="${pre}-${i}"><div class="txt"><label for="c-${pre}-${i}" class="lbl">${l}</label>${ex?" "+ex:""}</div></li>`}).join("")}</ul>`;
+
+const STEPS=[
+ {id:"prep",t:"לפני היציאה",d:"עד 8.12",html:()=>`
+  ${chk("prep",[
+   ["להזמין את הבית ב־Airbnb, 10–14.12","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"],
+   "לשאול את הירומי איך מחממים את הבית",
+   "לסגור לינה מ־14.12 ואילך",
+   "דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק",
+   "ביטוח נסיעות ל־9–24.12",
+   "למלא Visit Japan Web ולצלם את קודי ה־QR",
+   "eSIM יפני",
+   "Suica בארנק של הטלפון",
+   "קצת ין במזומן",
+   "מתאם חשמל לשקע אמריקאי שטוח",
+   "ג'ודוגי לבן",
+   "המצגות ב־PowerPoint על דיסק און קי",
+   "צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"])}`},
+ {id:"dep",t:"המראה מנתב״ג",d:"רביעי 9.12 · 19:00",html:()=>`
+  <div><div class="big">19:00</div><div class="sub">LY 091 · טרמינל 3 · מושב 44B · מזוודה אחת · הזמנה 9XSQI6</div></div>
+  ${chk("dep",["להגיע לטרמינל 3 עד 16:00","מסירת מזוודה וביקורת ביטחון","עלייה למטוס"])}`},
+ {id:"land",t:"נחיתה בנריטה",d:"חמישי 10.12 · 13:30 שעון יפן",html:()=>`
+  <div><div class="big">13:30</div><div class="sub">06:30 בבוקר בישראל · טרמינל 1</div></div>
+  ${chk("land",[
+   "ביקורת גבולות ומכס עם קודי ה־QR",
+   "להפעיל את ה־eSIM",
+   "למשוך ין בכספומט של סבן־אילבן"])}`},
+ {id:"toHome",t:"מנריטה לבית בצורומקי אונסן",d:"חמישי 10.12 · כ־2.5–3 שעות",html:()=>`
+  <div class="key"><b>את הכרטיס לנריטה אקספרס קונים במקום, לא מראש.</b> קונים לרכבת הקרובה אחרי שיוצאים מהמכס. המושב בכרטיס שמור, עם מספר קרון ומושב.</div>
+  ${chk("toHome",[
+   ["יורדים לקומת הרכבות B1 ומוצאים את הקופה של JR",sh("jrdesk","לא מוצאים? להראות")],
+   ["קונים 2 כרטיסי נריטה אקספרס לשינג׳וקו",sh("nex","להראות בקופה")],
+   ["עולים לקרון ולמושב שבכרטיס",sh("nexplat","איפה הרציף?")+" <span class='dur'>כ־85 דק׳</span>"],
+   ["בשינג׳וקו הולכים לפי השלטים הכחולים <span class='jp'>小田急線</span>, בצד המערבי",sh("odakyu")+" <span class='dur'>10–15 דק׳</span>"],
+   ["עולים לרכבת לכיוון <span class='jp'>小田原</span>, סוג אקספרס <span class='jp'>急行</span>",sh("stoptsuru","לשאול אם עוצרת")],
+   ["יורדים בצורומקי אונסן <span class='jp'>鶴巻温泉</span>","<span class='dur'>כ־65 דק׳ משינג׳וקו</span>"],
+   ["7 דק׳ הליכה לבית, צ׳ק־אין עצמי עם תיבת מנעול","<span class='dur'>כתובת וקוד מהירומי</span>"]])}
+  <div class="warn">לא לעלות על רכבת שהיעד שלה <span class="jp">片瀬江ノ島</span>. היא מתפצלת מהקו בסגאמי־אונו.</div>
+  <div class="warn">הצ׳ק־אין נסגר ב־22:00. אם יש עיכוב, הודעה להירומי.</div>
+  <div class="links"><a href="https://www.google.com/maps/dir/?api=1&origin=Narita+Airport+Terminal+1&destination=Tsurumaki-Onsen+Station&travelmode=transit" target="_blank" rel="noopener">מסלול בגוגל מפות</a>${sh("tsuru","כרטיס: לצורומקי אונסן")}</div>
+  <h3>הבית</h3>
+  <dl class="facts">
+   <dt>מקום</dt><dd>בית פרטי, חדאנו · 7 דק׳ מהתחנה</dd>
+   <dt>בבית</dt><dd>מיטה זוגית וספה נפתחת · מטבח · מכונת כביסה · אמבטיה</dd>
+   <dt>שעות</dt><dd class="n">צ׳ק־אין 15:00–22:00 · צ׳ק־אאוט עד 11:00</dd>
+  </dl>
+  <div class="warn">אין גלאי עשן בבית, לפי המודעה.</div>`},
+ {id:"day1",t:"כנס · יום שישי",d:"11.12 · 09:30–17:30 · מסיבת פתיחה 18:30",html:()=>`
+  ${chk("day1",[
+   ["7 דק׳ הליכה לתחנת <span class='jp'>鶴巻温泉</span>",""],
+   ["רכבת לכיוון <span class='jp'>小田原</span>, תחנה אחת, עד <span class='jp'>東海大学前</span>","<span class='dur'>כ־3 דק׳</span>"],
+   ["הליכה לקמפוס שונאן או מונית",sh("campus","להראות לנהג")+" <span class='dur'>15–20 דק׳</span>"],
+   ["בניין 15, חדר 611, עד 09:30",sh("bldg","לשאול איפה")],
+   "הרצאות, צהריים וסיור במכון למחקר ספורט",
+   "מסיבת פתיחה 18:30–20:00"])}
+  <div class="warn">לבדוק בלוח שהרכבת עוצרת ב־<span class="jp">東海大学前</span>. בספק, לעלות על <span class="jp">各駅停車</span> שעוצרת בכל תחנה.</div>
+  <div class="warn">המדריך של הכנס יוצא מהון־אצוגי ב־08:30, בכיוון ההפוך מאיתנו. עדיף להגיע ישר ולהודיע למייק.</div>
+  <div class="links"><a href="https://maps.app.goo.gl/iDLz8eWqA8Z6Yavk6" target="_blank" rel="noopener">הקמפוס במפה</a></div>`},
+ {id:"day2",t:"כנס · יום שבת",d:"12.12 · 09:30–17:00 · ג'ודוגי לבן",html:()=>`
+  ${chk("day2",[
+   "ג'ודוגי לבן בתיק",
+   ["רכבת תחנה אחת לטוקאי־דאיגקומאה והליכה לקמפוס",sh("campus","להראות לנהג")],
+   ["הדוג'ו באולם הבודוקאן, עד 09:30",sh("bldg","לשאול איפה")],
+   "הסשן המעשי: When Falling Techniques Conflict",
+   "צילומים קבוצתיים"])}
+  <div class="links"><a href="https://maps.app.goo.gl/sGrmZrQtGuX8YaAu6" target="_blank" rel="noopener">הבודוקאן במפה</a></div>`},
+ {id:"day3",t:"כנס · יום ראשון",d:"13.12 · 09:30–18:00 · ג'ודוגי לבן",html:()=>`
+  ${chk("day3",[
+   "ג'ודוגי לבן בתיק",
+   ["רכבת תחנה אחת לטוקאי־דאיגקומאה והליכה לקמפוס",sh("campus","להראות לנהג")],
+   "שיתוף בדוג'ו, טורניר קנדו נוער",
+   "הרצאות וטקס פרסים",
+   "חוזרים לישון בבית"])}`},
+ {id:"checkout",t:"צ׳ק־אאוט מהבית",d:"שני 14.12 · עד 11:00",html:()=>`
+  ${chk("checkout",["לארוז הכול, כולל ג'ודוגי וכביסה","להחזיר את המפתח לתיבה","לצאת עד 11:00"])}
+  <h3>לאן ממשיכים</h3>
+  <textarea data-note="next" placeholder="היעד הבא ואיך מגיעים"></textarea>`},
+ {id:"open",t:"הימים הפתוחים",d:"14–23.12",html:()=>`
+  <textarea data-note="open" style="min-height:120px" placeholder="14.12 —&#10;15.12 —&#10;16.12 —"></textarea>
+  ${chk("open",["לינה ללילה האחרון קרוב לנריטה או לשינג׳וקו"])}`},
+ {id:"ret",t:"טיסה הביתה",d:"חמישי 24.12 · 15:45 מנריטה",html:()=>`
+  <div><div class="big">15:45</div><div class="sub">LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50</div></div>
+  <div class="key">שוב קונים את נריטה אקספרס במקום, בקופה של JR בתחנה שיוצאים ממנה.</div>
+  ${chk("ret",[
+   ["מגיעים לקופה של JR",sh("jrdesk","לא מוצאים? להראות")],
+   ["קונים 2 כרטיסי נריטה אקספרס לטרמינל 1",sh("nexback","להראות בקופה")],
+   ["יורדים בתחנה הראשונה של השדה, טרמינל 1 <span class='jp'>第1ターミナル</span>",sh("airport","לשאול")],
+   "בשדה עד 12:45",
+   "צ׳ק־אין באל על ומסירת מזוודות"])}`},
+ {id:"cards",t:"כרטיסים ואזהרות",d:"להראות לאנשים כשמסתבכים",always:true,html:()=>`
+  <div class="cards">${Object.entries(CARDS).map(([id,c])=>`<button class="card" data-card="${id}"><div class="he">${c.he}</div><div class="ja">${c.ja.replace(/\n/g,"")}</div>${c.addr?`<div class="addr">${c.addr}</div>`:""}<div class="ro">${c.ro}</div></button>`).join("")}</div>
+  <h3>לזכור בדרכים</h3>
+  <ul class="plain">
+   <li>רכבות דחוסות מאוד ב־07:30–09:30. עם מזוודות, לנסוע מחוץ לשעות האלה.</li>
+   <li>רכבות אחרונות בסביבות חצות.</li>
+   <li>הרכבת הלבנה (רומנסקאר) עולה תוספת ודורשת כרטיס משוריין.</li>
+   <li>במונית הדלת האחורית נפתחת לבד.</li>
+   <li>לא מדברים בטלפון ברכבת.</li>
+   <li>קר: בערך 3–13 מעלות.</li>
+  </ul>
+  <h3>חירום</h3>
+  <div><b class="n">110</b> משטרה · <b class="n">119</b> אמבולנס וכיבוי ${sh("help","כרטיס עזרה")}</div>
+  <h3>אנשי קשר בכנס</h3>
+  <dl class="facts">
+   <dt>מארגן</dt><dd>פרופ׳ מייק קאלן · וואטסאפ <span dir="ltr" class="n">+44 7866 836368</span></dd>
+   <dt>מנהלה</dt><dd>ג׳ייד · admin@judospace.com</dd>
+  </dl>`}
+];
+
+const store={get(k,d){try{const v=localStorage.getItem("jp26:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("jp26:"+k,JSON.stringify(v))}catch(e){}},
+  clear(){try{Object.keys(localStorage).filter(k=>k.startsWith("jp26:")).forEach(k=>localStorage.removeItem(k))}catch(e){}}};
+const mem={}; // fallback when storage is unavailable
+const isChecked=k=>k in mem?mem[k]:!!store.get("c:"+k,false);
+const keysOf=s=>[...s.html().matchAll(/data-k="([^"]+)"/g)].map(m=>m[1]);
+const stat=s=>{const ks=keysOf(s);const d=ks.filter(isChecked).length;return {n:ks.length,d,done:ks.length>0&&d===ks.length}};
+const nextIdx=()=>STEPS.findIndex(s=>!s.always&&!stat(s).done);
+
+let open=store.get("open3",null);
+if(open===null)open=nextIdx();
+const acc=document.getElementById("acc");
+function render(){
+  const nx=nextIdx();
+  acc.innerHTML=STEPS.map((s,i)=>{
+    const st=stat(s),isNext=i===nx,isOpen=i===open;
+    const tag=s.always?"":st.done?"הושלם":isNext?`הבא · ${st.d}/${st.n}`:st.d?`${st.d}/${st.n}`:"";
+    return `<div class="st ${st.done&&!s.always?"done":""} ${isNext?"next":""} ${isOpen?"open":""}" id="${s.id}">
+     <button class="head" data-i="${i}" aria-expanded="${isOpen}"><span class="num">${s.always?"·":st.done?"✓":i+1}</span>
+      <span><div class="t">${s.t}</div><div class="d">${s.d}</div></span>
+      <span class="tag"><span class="tt">${tag}</span><span class="chev">‹</span></span></button>
+     <div class="body" ${isOpen?"":"hidden"}>${s.html()}</div></div>`}).join("");
+  acc.querySelectorAll("input[data-k]").forEach(c=>{c.checked=isChecked(c.dataset.k);c.closest("li").classList.toggle("ck",c.checked)});
+  acc.querySelectorAll("textarea[data-note]").forEach(t=>t.value=store.get("n:"+t.dataset.note,""));
+}
+function setOpen(i){open=i;store.set("open3",i)}
+acc.addEventListener("click",e=>{
+  const h=e.target.closest(".head");if(h){const i=+h.dataset.i;setOpen(open===i?-1:i);render()}
+});
+acc.addEventListener("change",e=>{
+  const k=e.target.dataset.k;if(!k)return;
+  mem[k]=e.target.checked;store.set("c:"+k,e.target.checked);
+  e.target.closest("li").classList.toggle("ck",e.target.checked);
+  const i=STEPS.findIndex(s=>keysOf(s).includes(k));
+  const st=stat(STEPS[i]);
+  // update the header counter without re-rendering the open section
+  if(st.done){
+    setTimeout(()=>{const nx=nextIdx();setOpen(nx);render();
+      if(nx>=0)document.getElementById(STEPS[nx].id).scrollIntoView({behavior:"smooth",block:"start"})},450);
+  }else{
+    const tag=document.querySelector(`#${STEPS[i].id} .tag`);
+    if(tag)tag.querySelector(".tt").textContent=(i===nextIdx()?"הבא · ":"")+`${st.d}/${st.n}`;
+  }
+});
+acc.addEventListener("input",e=>{if(e.target.dataset.note)store.set("n:"+e.target.dataset.note,e.target.value)});
+
+const full=document.getElementById("full");
+document.addEventListener("click",e=>{const b=e.target.closest("[data-card]");if(!b)return;e.preventDefault();const c=CARDS[b.dataset.card];if(!c)return;
+  document.getElementById("fJa").innerHTML=c.ja.replace(/\n/g,"<br>");
+  document.getElementById("fAddr").textContent=c.addr||"";
+  document.getElementById("fHe").textContent=c.he+"  ·  "+c.ro;
+  full.hidden=false;try{navigator.wakeLock&&navigator.wakeLock.request("screen").catch(()=>{})}catch(e){}
+  document.getElementById("close").focus()});
+document.getElementById("close").onclick=()=>full.hidden=true;
+full.addEventListener("click",e=>{if(e.target===full)full.hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")full.hidden=true});
+
+document.getElementById("reset").onclick=()=>document.getElementById("resetAsk").hidden=false;
+document.getElementById("resetYes").onclick=()=>{store.clear();for(const k in mem)delete mem[k];setOpen(0);document.getElementById("resetAsk").hidden=true;render()};
+
+function fmt(tz){return new Intl.DateTimeFormat("he-IL",{hour:"2-digit",minute:"2-digit",timeZone:tz,hour12:false}).format(new Date())}
+function tick(){
+  document.getElementById("cIL").textContent=fmt("Asia/Jerusalem");
+  document.getElementById("cJP").textContent=fmt("Asia/Tokyo");
+  const d=Math.ceil((new Date("2026-12-09T19:00:00+02:00")-new Date())/864e5);
+  document.getElementById("cd").innerHTML=d>0?`עוד <b>${d}</b> ימים להמראה`:"";
+}
+render();tick();setInterval(tick,30000);
+</script>
+
+<script>
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+let deferred=null;const ib=document.getElementById("installBtn");
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;ib.hidden=false});
+ib.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;ib.hidden=true};
+document.getElementById("shareBtn").onclick=async()=>{const d={title:"יפן · דצמבר 2026",url:location.href};
+ try{if(navigator.share)await navigator.share(d);else{await navigator.clipboard.writeText(location.href);alert("הקישור הועתק")}}catch(e){}};
+</script>
+</body>
+</html>
