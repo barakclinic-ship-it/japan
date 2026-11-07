@@ -31,6 +31,18 @@ body{margin:0}[hidden]{display:none!important}
 #here .ha{display:flex;flex-wrap:wrap;gap:14px}
 #here .ha button{background:none;border:0;padding:0;color:#3d5a80;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:15px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.locbar.on .locdot{animation:none}}
+
+.term{display:inline;background:none;border:0;padding:0;font:inherit;color:inherit;border-bottom:1px dotted #3d5a80;cursor:pointer;text-align:inherit}
+.term .en{font-size:.88em;color:#3d5a80;direction:ltr;unicode-bidi:isolate}
+#tip{position:fixed;inset:auto 0 0 0;z-index:15;background:#fff;border-top:1px solid #ececea;box-shadow:0 -8px 24px rgba(0,0,0,.08);padding:16px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+#tip .in{max-width:600px;margin:0 auto;display:grid;gap:6px}
+#tip .h{font-size:18px;font-weight:700}
+#tip .en{color:#3d5a80;direction:ltr;unicode-bidi:isolate;font-weight:600}
+#tip .jp{font-size:20px}
+#tip .x{justify-self:start;background:#f3f3f1;border:0;border-radius:99px;padding:4px 12px;font:inherit;font-size:14px;cursor:pointer}
+dl.gloss{margin:0;display:grid;gap:10px;font-size:15px}
+dl.gloss dt .en{color:#3d5a80;direction:ltr;unicode-bidi:isolate}
+dl.gloss dd{margin:2px 0 0;color:#73777d}
 </style>
 </head>
 <body>
@@ -132,6 +144,7 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 </footer>
 </div>
 
+<div id="tip" hidden role="dialog"><div class="in"><div class="h" id="tipH"></div><div><span class="en" id="tipEn"></span> <span class="jp" id="tipJp"></span></div><div id="tipD"></div><button class="x" id="tipX">סגור</button></div></div>
 <div id="full" hidden role="dialog" aria-modal="true">
   <button id="close">סגור</button>
   <div class="ja" id="fJa"></div>
@@ -164,113 +177,152 @@ const sh=(id,label)=>`<button class="show" data-card="${id}">${label||"להרא�
 const chk=(pre,items)=>`<ul class="chk">${items.map((x,i)=>{const [l,ex]=Array.isArray(x)?x:[x,""];
   return `<li><input type="checkbox" id="c-${pre}-${i}" data-k="${pre}-${i}"><div class="txt"><label for="c-${pre}-${i}" class="lbl">${l}</label>${ex?" "+ex:""}</div></li>`}).join("")}</ul>`;
 
+/* Place and term dictionary: Hebrew, how it is written in English (as on signs), Japanese, and what it is */
+const TERMS={
+ narita:["נריטה","Narita","成田","נמל התעופה הבינלאומי של טוקיו, כשעה וחצי ברכבת ממרכז העיר. אל על נוחתת ויוצאת מטרמינל 1."],
+ t1:["טרמינל 1","Terminal 1","第1ターミナル","הטרמינל של אל על בנריטה. לתחנת הרכבת שלו יורדים לקומה B1 (מרתף)."],
+ nex:["נריטה אקספרס","Narita Express · N'EX","成田エクスプレス","רכבת מהירה של חברת JR, מהשדה ישר למרכז טוקיו. אדומה־לבנה־שחורה. כל המושבים בה שמורים, וקונים כרטיס בקופה."],
+ jr:["ג׳יי־אר","JR","JR","חברת הרכבות הלאומית של יפן. לקופות שלה יש שלט ירוק עם האותיות JR."],
+ shinjuku:["שינג׳וקו","Shinjuku","新宿","רובע במרכז טוקיו, ותחנת הרכבת העמוסה בעולם. כאן יורדים מהנריטה אקספרס ועוברים לקו אודקיו."],
+ odakyu:["אודקיו","Odakyu","小田急","חברת רכבות פרטית. הקו שלה יוצא משינג׳וקו דרומה־מערבה, עובר ליד הבית שלנו וליד הקמפוס. השלטים שלה כחולים."],
+ odawara:["אודווארה","Odawara","小田原","העיר בסוף הקו של אודקיו. זה הכיוון שלנו: על הרכבת ועל הרציף כתוב 小田原."],
+ kyuko:["קיוּקוֹ (אקספרס)","Kyūkō · Express","急行","סוג רכבת שעוצרת רק בחלק מהתחנות. מהירה יותר מרכבת רגילה. הסוג כתוב בצבע על הרכבת ועל הלוח."],
+ kakueki:["רכבת מקומית","Kakueki-teisha · Local","各駅停車","רכבת שעוצרת בכל תחנה. איטית, אבל תמיד עוצרת איפה שצריך."],
+ enoshima:["קטסה־אנושימה","Katase-Enoshima","片瀬江ノ島","יעד של ענף אחר של קו אודקיו, לכיוון הים. רכבת עם היעד הזה לא מגיעה אלינו."],
+ sagamiono:["סגאמי־אונו","Sagami-Ōno","相模大野","התחנה שבה קו אודקיו מתפצל לשני ענפים. אחריה צריך להיות בענף לכיוון 小田原."],
+ honatsugi:["הון־אצוגי","Hon-Atsugi","本厚木","תחנה גדולה, 3 תחנות לפני שלנו. שם המלון שהכנס המליץ עליו, ושם עוצרת הרומנסקאר."],
+ tsuru:["צורומקי אונסן","Tsurumaki-Onsen","鶴巻温泉","התחנה שלנו. ״אונסן״ זה מעיין חם, ויש ליד התחנה מרחץ ציבורי. 7 דקות הליכה מהבית."],
+ hadano:["חדאנו","Hadano","秦野","העיר שבה נמצא הבית."],
+ tokaist:["טוקאי־דאיגקומאה","Tokai-Daigakumae","東海大学前","בתרגום: ״מול אוניברסיטת טוקאי״. תחנת הקמפוס, תחנה אחת אחרי שלנו."],
+ tokai:["אוניברסיטת טוקאי","Tokai University","東海大学","האוניברסיטה שמארחת את הכנס."],
+ shonan:["קמפוס שונאן","Shonan Campus","湘南キャンパス","הקמפוס שבו מתקיים הכנס, בעיר הירטסוקה (Hiratsuka)."],
+ bldg15:["בניין 15","Building 15","15号館","בניין ההרצאות. חדר 611."],
+ budokan:["בודוקאן","Budokan","武道館","אולם אמנויות הלחימה של הקמפוס. שם הדוג'ו של הימים המעשיים."],
+ romance:["רומנסקאר","Romancecar","ロマンスカー","רכבת מהירה ונוחה של אודקיו, לבנה. מושבים שמורים בתוספת תשלום. קונים כרטיס בקופה של אודקיו."],
+ kitaguchi:["יציאה צפונית","North Exit · Kita-guchi","北口","שם היציאה בתחנה. כך כתוב על השלטים."],
+ suica:["סוּאיקָה","Suica","Suica","כרטיס נסיעה נטען, כמו רב־קו. טוענים כסף ומעבירים בשער של כל רכבת (JR, אודקיו), אוטובוס, ואפילו בקופה של סבן־אילבן. באייפון אפשר להוסיף אותו ל־Apple Wallet. אחרת קונים כרטיס פיזי Welcome Suica לתיירים במכונה בשדה."],
+ locker:["לוקרים","Coin Locker","コインロッカー","ארונות נעולים למזוודות בתחנות רכבת. משלמים במטבעות או ב־Suica."],
+ seven:["סבן־אילבן","7-Eleven","セブンイレブン","רשת מכולות. הכספומטים שלה מקבלים כרטיסי אשראי זרים."],
+ vjw:["Visit Japan Web","Visit Japan Web","","אתר רשמי של ממשלת יפן (vjw-lp.digital.go.jp). ממלאים בו מראש, בבית, את טופס ההגירה ואת הצהרת המכס, ומקבלים שני ריבועי QR. בשדה סורקים אותם בביקורת הגבולות ובמכס במקום למלא טפסים בכתב יד. בלי אינטרנט בשדה, צריך צילום מסך שלהם."]
+};
+const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
+const J=s=>`<span class="jp">${s}</span>`;
+
 const STEPS=[
  {id:"prep",t:"לפני היציאה",d:"עד 8.12",html:()=>`
   ${chk("prep",[
    ["להזמין את הבית ב־Airbnb, 10–14.12 (4 לילות)","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"],
-   "לשאול את הירומי איך מחממים את הבית",
+   "לשאול את המארחת הירומי איך מחממים את הבית",
    "לסגור לינה מ־14.12 ואילך",
    "דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק",
    "ביטוח נסיעות ל־9–24.12",
-   "למלא Visit Japan Web ולצלם את קודי ה־QR",
-   "eSIM יפני",
-   "Suica בארנק של הטלפון",
-   "קצת ין במזומן",
-   "מתאם חשמל לשקע אמריקאי שטוח",
+   ["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) ולשמור צילום מסך של קודי ה־QR",""],
+   "חבילת גלישה ליפן ב־eSIM (למשל esimo), להתקין בבית ולהפעיל בנחיתה",
+   ["כרטיס נסיעה "+T("suica","Suica")+": באייפון דרך Apple Wallet, או קונים כרטיס Welcome Suica בשדה",""],
+   "קצת ין (מטבע יפני) במזומן",
+   "מתאם חשמל לשקע אמריקאי שטוח (Type A)",
    "ג'ודוגי לבן",
    "המצגות ב־PowerPoint על דיסק און קי",
    "צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"])}`},
  {id:"dep",t:"המראה מנתב״ג",d:"רביעי 9.12 · 19:00",html:()=>`
-  <div><div class="big">19:00</div><div class="sub">LY 091 · טרמינל 3 · מושב 44B · מזוודה אחת · הזמנה 9XSQI6</div></div>
+  <div><div class="big">19:00</div><div class="sub">טיסה LY 091 · טרמינל 3 · מושב 44B · מזוודה אחת · הזמנה 9XSQI6</div></div>
   ${chk("dep",["להגיע לטרמינל 3 עד 16:00","מסירת מזוודה וביקורת ביטחון","עלייה למטוס"])}`},
  {id:"land",t:"נחיתה בנריטה",d:"חמישי 10.12 · 13:30 שעון יפן",html:()=>`
-  <div><div class="big">13:30</div><div class="sub">06:30 בבוקר בישראל · טרמינל 1</div></div>
+  <div><div class="big">13:30</div><div class="sub">06:30 בבוקר בישראל</div></div>
+  <div>נוחתים ב${T("narita")}, ${T("t1")}.</div>
   ${chk("land",[
-   "ביקורת גבולות ומכס עם קודי ה־QR",
+   "ביקורת גבולות (Immigration) ומכס (Customs): מראים את קודי ה־QR",
    "להפעיל את ה־eSIM",
-   "למשוך ין בכספומט של סבן־אילבן"])}`},
- {id:"toHome",t:"מנריטה לבית בצורומקי אונסן",d:"חמישי 10.12 · יציאה ~15:00 · בבית ~18:30",html:()=>`
-  <h3>לוח זמנים משוער</h3>
+   ["למשוך ין בכספומט של "+T("seven"),""]])}`},
+ {id:"toHome",t:"מנריטה לבית",d:"חמישי 10.12 · יציאה ~15:00 · בבית ~18:30",html:()=>`
+  <div class="sub">המסלול: ${T("narita")} ← רכבת ${T("nex")} ← ${T("shinjuku")} ← רכבת ${T("odakyu")} ← ${T("tsuru")} ← הבית</div>
+  <h3>לוח זמנים משוער (שעון יפן)</h3>
   <dl class="facts tl">
    <dt>13:30</dt><dd>נחיתה</dd>
    <dt>14:30</dt><dd>יוצאים מהמכס עם המזוודות</dd>
-   <dt>15:00</dt><dd>eSIM, כספומט, כרטיסים בקופה של JR</dd>
-   <dt>15:15</dt><dd>נריטה אקספרס יוצאת (רכבת כל 30–60 דק׳)</dd>
-   <dt>16:45</dt><dd>שינג׳וקו, מעבר לקו אודקיו</dd>
-   <dt>17:10</dt><dd>רכבת אודקיו לכיוון <span class="jp">小田原</span></dd>
-   <dt>18:20</dt><dd>צורומקי אונסן <span class="jp">鶴巻温泉</span></dd>
-   <dt>18:30</dt><dd><b>בבית</b> · צ׳ק־אין עד 22:00, יש מרווח של 3.5 שעות</dd>
+   <dt>15:00</dt><dd>eSIM, כספומט, כרטיסים בקופה</dd>
+   <dt>15:15</dt><dd>יוצאת רכבת נריטה אקספרס (יש אחת כל 30–60 דק׳)</dd>
+   <dt>16:45</dt><dd>מגיעים לשינג׳וקו ועוברים לקו אודקיו</dd>
+   <dt>17:10</dt><dd>רכבת אודקיו לכיוון אודווארה ${J("小田原")}</dd>
+   <dt>18:20</dt><dd>יורדים בצורומקי אונסן ${J("鶴巻温泉")}</dd>
+   <dt>18:30</dt><dd><b>בבית</b> · אפשר להיכנס עד 22:00</dd>
   </dl>
-  <div class="warn">היציאה משינג׳וקו נופלת על שעת העומס של הערב (17:00–19:00). עם מזוודות הרכבות צפופות מאוד. אפשרות נוחה יותר: <b>רומנסקאר</b> משינג׳וקו עד <b>הון־אצוגי</b> <span class="jp">本厚木</span> (מושב שמור, בתוספת תשלום, קונים בקופה של אודקיו), ומשם רכבת רגילה 3 תחנות לצורומקי אונסן.</div>
-  <div class="key"><b>את הכרטיס לנריטה אקספרס קונים במקום, לא מראש.</b> קונים לרכבת הקרובה אחרי שיוצאים מהמכס. המושב בכרטיס שמור, עם מספר קרון ומושב.</div>
+  <div class="key"><b>את הכרטיס לנריטה אקספרס קונים במקום, לא מראש.</b> קונים לרכבת הקרובה אחרי שיוצאים מהמכס. בכרטיס יש מושב שמור: מספר קרון ומספר מושב, כמו בטיסה.</div>
+  <h3>שלב אחרי שלב</h3>
   ${chk("toHome",[
-   ["יורדים לקומת הרכבות B1 ומוצאים את הקופה של JR",sh("jrdesk","לא מוצאים? להראות")],
-   ["קונים 2 כרטיסי נריטה אקספרס לשינג׳וקו",sh("nex","להראות בקופה")],
-   ["עולים לקרון ולמושב שבכרטיס",sh("nexplat","איפה הרציף?")+" <span class='dur'>כ־85 דק׳</span>"],
-   ["בשינג׳וקו הולכים לפי השלטים הכחולים <span class='jp'>小田急線</span>, בצד המערבי",sh("odakyu")+" "+sh("romance","כרטיס רומנסקאר")+" <span class='dur'>10–15 דק׳</span>"],
-   ["עולים לרכבת לכיוון <span class='jp'>小田原</span>, סוג אקספרס <span class='jp'>急行</span>",sh("stoptsuru","לשאול אם עוצרת")],
-   ["יורדים בצורומקי אונסן <span class='jp'>鶴巻温泉</span>","<span class='dur'>כ־65 דק׳ משינג׳וקו</span>"],
-   ["7 דק׳ הליכה לבית, צ׳ק־אין עצמי עם תיבת מנעול","<span class='dur'>כתובת וקוד מהירומי</span>"]])}
-  <div class="warn">לא לעלות על רכבת שהיעד שלה <span class="jp">片瀬江ノ島</span>. היא מתפצלת מהקו בסגאמי־אונו.</div>
-  <div class="warn">הצ׳ק־אין נסגר ב־22:00. אם יש עיכוב, הודעה להירומי.</div>
+   ["בשדה יורדים במדרגות או במעלית לקומה B1 (מרתף), לפי השלטים Railways. שם הקופה של "+T("jr")+" עם השלט הירוק.",sh("jrdesk","לא מוצאים? להראות")],
+   ["קונים 2 כרטיסים לרכבת "+T("nex")+" עד "+T("shinjuku")+".",sh("nex","להראות בקופה")],
+   ["עוברים בשער עם הכרטיס, יורדים לרציף ועומדים ליד מספר הקרון שעל הכרטיס (מסומן על הרצפה). המזוודות בכניסה לקרון.",sh("nexplat","איפה הרציף?")+" <span class='dur'>נסיעה של כ־85 דק׳</span>"],
+   ["בשינג׳וקו יוצאים מהרכבת והולכים לפי השלטים הכחולים "+J("小田急線")+" ("+T("odakyu","קו אודקיו")+"), בצד המערבי של התחנה (West). שם קונים כרטיס, או מעבירים "+T("suica","Suica")+".",sh("odakyu","לא מוצאים? להראות")+" <span class='dur'>10–15 דק׳ הליכה</span>"],
+   ["עולים על רכבת שעליה כתוב "+J("小田原")+" ("+T("odawara")+"), מסוג "+J("急行")+" ("+T("kyuko","אקספרס")+").",sh("stoptsuru","לשאול אם עוצרת אצלנו")],
+   ["יורדים ב"+T("tsuru")+". על הלוח ברכבת יופיע "+J("鶴巻温泉")+".","<span class='dur'>כ־65 דק׳ משינג׳וקו</span>"],
+   ["7 דקות הליכה לבית. צ׳ק־אין עצמי: המפתח בתיבה עם קוד.","<span class='dur'>הכתובת והקוד מגיעים מהמארחת באפליקציה של Airbnb</span>"]])}
+  <div class="warn">ב${T("sagamiono")} הקו מתפצל. לא לעלות על רכבת שהיעד שלה ${J("片瀬江ノ島")} (${T("enoshima")}), היא לא מגיעה אלינו.</div>
+  <div class="warn">היציאה משינג׳וקו בסביבות 17:00 היא שעת עומס, והרכבות צפופות מאוד עם מזוודות. אפשרות נוחה יותר: ${T("romance")} משינג׳וקו עד ${T("honatsugi")} (מושב שמור, בתוספת תשלום, קונים בקופה של אודקיו), ומשם רכבת רגילה 3 תחנות לצורומקי אונסן. ${sh("romance","כרטיס רומנסקאר")}</div>
+  <div class="warn">הכניסה לבית אפשרית עד 22:00. אם יש עיכוב, לשלוח הודעה להירומי ב־Airbnb.</div>
   <div class="links"><a href="https://www.google.com/maps/dir/?api=1&origin=Narita+Airport+Terminal+1&destination=Tsurumaki-Onsen+Station&travelmode=transit" target="_blank" rel="noopener">מסלול בגוגל מפות</a>${sh("tsuru","כרטיס: לצורומקי אונסן")}</div>
   <h3>הבית</h3>
   <dl class="facts">
-   <dt>מקום</dt><dd>בית פרטי, חדאנו · 7 דק׳ מהתחנה</dd>
+   <dt>איפה</dt><dd>בית פרטי בעיר ${T("hadano")}, 7 דק׳ הליכה מתחנת ${T("tsuru")}</dd>
    <dt>בבית</dt><dd>מיטה זוגית וספה נפתחת · מטבח · מכונת כביסה · אמבטיה</dd>
-   <dt>שעות</dt><dd class="n">צ׳ק־אין 15:00–22:00 · צ׳ק־אאוט עד 11:00</dd>
+   <dt>שעות</dt><dd class="n">כניסה 15:00–22:00 · יציאה עד 11:00</dd>
   </dl>
   <div class="warn">אין גלאי עשן בבית, לפי המודעה.</div>`},
  {id:"day1",t:"כנס · יום שישי",d:"11.12 · 09:30–17:30 · מסיבת פתיחה 18:30",html:()=>`
+  <div class="sub">המסלול: הבית ← ${T("tsuru")} ← תחנה אחת ← ${T("tokaist")} ← הליכה ל${T("shonan")}</div>
   ${chk("day1",[
-   ["7 דק׳ הליכה לתחנת <span class='jp'>鶴巻温泉</span>",""],
-   ["רכבת לכיוון <span class='jp'>小田原</span>, תחנה אחת, עד <span class='jp'>東海大学前</span>","<span class='dur'>כ־3 דק׳</span>"],
-   ["הליכה לקמפוס שונאן או מונית",sh("campus","להראות לנהג")+" <span class='dur'>15–20 דק׳</span>"],
-   ["בניין 15, חדר 611, עד 09:30",sh("bldg","לשאול איפה")],
-   "הרצאות, צהריים וסיור במכון למחקר ספורט",
+   ["7 דקות הליכה מהבית לתחנת "+T("tsuru")+".",""],
+   ["רכבת לכיוון "+J("小田原")+" ("+T("odawara")+"), תחנה אחת בלבד, עד "+T("tokaist")+" "+J("東海大学前")+".","<span class='dur'>כ־3 דק׳</span>"],
+   ["מהתחנה הולכים ל"+T("shonan")+" של "+T("tokai")+", או לוקחים מונית.",sh("campus","להראות לנהג")+" <span class='dur'>15–20 דק׳ הליכה</span>"],
+   ["מגיעים ל"+T("bldg15")+", חדר 611, עד 09:30.",sh("bldg","לשאול איפה")],
+   "הרצאות, ארוחת צהריים וסיור במכון למחקר ספורט",
    "מסיבת פתיחה 18:30–20:00"])}
-  <div class="warn">לבדוק בלוח שהרכבת עוצרת ב־<span class="jp">東海大学前</span>. בספק, לעלות על <span class="jp">各駅停車</span> שעוצרת בכל תחנה.</div>
-  <div class="warn">המדריך של הכנס יוצא מהון־אצוגי ב־08:30, בכיוון ההפוך מאיתנו. עדיף להגיע ישר ולהודיע למייק.</div>
+  <div class="warn">לא כל רכבת עוצרת ב־${J("東海大学前")}. לבדוק בלוח שבתחנה שהיא ברשימה. בספק, לעלות על ${J("各駅停車")} (${T("kakueki","רכבת מקומית")}).</div>
+  <div class="warn">המדריך של הכנס יוצא ב־08:30 מה${T("kitaguchi")} של תחנת ${T("honatsugi")}. זה בכיוון ההפוך מאיתנו, אז עדיף להגיע ישר לקמפוס ולהודיע למייק.</div>
   <div class="links"><a href="https://maps.app.goo.gl/iDLz8eWqA8Z6Yavk6" target="_blank" rel="noopener">הקמפוס במפה</a></div>`},
  {id:"day2",t:"כנס · יום שבת",d:"12.12 · 09:30–17:00 · ג'ודוגי לבן",html:()=>`
   ${chk("day2",[
    "ג'ודוגי לבן בתיק",
-   ["רכבת תחנה אחת לטוקאי־דאיגקומאה והליכה לקמפוס",sh("campus","להראות לנהג")],
-   ["הדוג'ו באולם הבודוקאן, עד 09:30",sh("bldg","לשאול איפה")],
+   ["רכבת תחנה אחת מ"+T("tsuru")+" ל"+T("tokaist")+", והליכה לקמפוס.",sh("campus","להראות לנהג")],
+   ["ה־דוג'ו באולם ה"+T("budokan")+", עד 09:30.",sh("bldg","לשאול איפה")],
    "הסשן המעשי: When Falling Techniques Conflict",
    "צילומים קבוצתיים"])}
   <div class="links"><a href="https://maps.app.goo.gl/sGrmZrQtGuX8YaAu6" target="_blank" rel="noopener">הבודוקאן במפה</a></div>`},
  {id:"day3",t:"כנס · יום ראשון",d:"13.12 · 09:30–18:00 · ג'ודוגי לבן",html:()=>`
   ${chk("day3",[
    "ג'ודוגי לבן בתיק",
-   ["רכבת תחנה אחת לטוקאי־דאיגקומאה והליכה לקמפוס",sh("campus","להראות לנהג")],
-   "שיתוף בדוג'ו, טורניר קנדו נוער",
+   ["רכבת תחנה אחת מ"+T("tsuru")+" ל"+T("tokaist")+", והליכה לקמפוס.",sh("campus","להראות לנהג")],
+   ["שיתוף בדוג'ו ב"+T("budokan")+", טורניר קנדו נוער",""],
    "הרצאות וטקס פרסים",
    "חוזרים לישון בבית"])}`},
- {id:"checkout",t:"צ׳ק־אאוט מהבית",d:"שני 14.12 · עד 11:00",html:()=>`
+ {id:"checkout",t:"יציאה מהבית",d:"שני 14.12 · עד 11:00",html:()=>`
   ${chk("checkout",["לארוז הכול, כולל ג'ודוגי וכביסה","להחזיר את המפתח לתיבה","לצאת עד 11:00"])}
+  <div class="sub">אם צריך להשאיר מזוודות: ${T("locker")} בתחנה. ${sh("locker","לשאול איפה")}</div>
   <h3>לאן ממשיכים</h3>
   <textarea data-note="next" placeholder="היעד הבא ואיך מגיעים"></textarea>`},
  {id:"open",t:"הימים הפתוחים",d:"14–23.12",html:()=>`
   <textarea data-note="open" style="min-height:120px" placeholder="14.12 —&#10;15.12 —&#10;16.12 —"></textarea>
-  ${chk("open",["לינה ללילה האחרון קרוב לנריטה או לשינג׳וקו"])}`},
+  ${chk("open",[["לינה ללילה האחרון קרוב ל"+T("narita")+" או ל"+T("shinjuku"),""]])}`},
  {id:"ret",t:"טיסה הביתה",d:"חמישי 24.12 · 15:45 מנריטה",html:()=>`
-  <div><div class="big">15:45</div><div class="sub">LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50</div></div>
-  <div class="key">שוב קונים את נריטה אקספרס במקום, בקופה של JR בתחנה שיוצאים ממנה.</div>
+  <div><div class="big">15:45</div><div class="sub">טיסה LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50</div></div>
+  <div class="sub">המסלול: ${T("shinjuku")} (או תחנת טוקיו, Tokyo) ← רכבת ${T("nex")} ← ${T("narita")} ${T("t1")}</div>
+  <div class="key">שוב קונים את כרטיס הנריטה אקספרס במקום, בקופה של JR בתחנה שיוצאים ממנה. להיות בשדה עד 12:45.</div>
   ${chk("ret",[
-   ["מגיעים לקופה של JR",sh("jrdesk","לא מוצאים? להראות")],
-   ["קונים 2 כרטיסי נריטה אקספרס לטרמינל 1",sh("nexback","להראות בקופה")],
-   ["יורדים בתחנה הראשונה של השדה, טרמינל 1 <span class='jp'>第1ターミナル</span>",sh("airport","לשאול")],
+   ["מגיעים לקופה של "+T("jr")+" (שלט ירוק).",sh("jrdesk","לא מוצאים? להראות")],
+   ["קונים 2 כרטיסי "+T("nex")+" עד "+T("narita")+", "+T("t1")+".",sh("nexback","להראות בקופה")],
+   ["יורדים בתחנה הראשונה של השדה: Narita Airport Terminal 1 "+J("成田空港")+". לא בתחנה Terminal 2·3.",sh("airport","לשאול")],
    "בשדה עד 12:45",
    "צ׳ק־אין באל על ומסירת מזוודות"])}`},
- {id:"cards",t:"כרטיסים ואזהרות",d:"להראות לאנשים כשמסתבכים",always:true,html:()=>`
+ {id:"cards",t:"כרטיסים, מילון ואזהרות",d:"להראות לאנשים כשמסתבכים",always:true,html:()=>`
   <div class="cards">${Object.entries(CARDS).map(([id,c])=>`<button class="card" data-card="${id}"><div class="he">${c.he}</div><div class="ja">${c.ja.replace(/\n/g,"")}</div>${c.addr?`<div class="addr">${c.addr}</div>`:""}<div class="ro">${c.ro}</div></button>`).join("")}</div>
+  <h3>מילון מקומות ומונחים</h3>
+  <dl class="gloss">${Object.values(TERMS).map(t=>`<dt><b>${t[0]}</b> <span class="en">${t[1]}</span> ${t[2]?`<span class="jp">${t[2]}</span>`:""}</dt><dd>${t[3]}</dd>`).join("")}</dl>
   <h3>לזכור בדרכים</h3>
   <ul class="plain">
-   <li>רכבות דחוסות מאוד ב־07:30–09:30. עם מזוודות, לנסוע מחוץ לשעות האלה.</li>
-   <li>רכבות אחרונות בסביבות חצות.</li>
-   <li>הרכבת הלבנה (רומנסקאר) עולה תוספת ודורשת כרטיס משוריין.</li>
-   <li>במונית הדלת האחורית נפתחת לבד.</li>
+   <li>רכבות דחוסות מאוד ב־07:30–09:30 וב־17:00–19:00. עם מזוודות, עדיף מחוץ לשעות האלה.</li>
+   <li>הרכבות האחרונות יוצאות בסביבות חצות.</li>
+   <li>הרומנסקאר (Romancecar) עולה תוספת ודורשת כרטיס עם מושב שמור.</li>
+   <li>במונית הדלת האחורית נפתחת ונסגרת לבד.</li>
    <li>לא מדברים בטלפון ברכבת.</li>
    <li>קר: בערך 3–13 מעלות.</li>
   </ul>
@@ -278,8 +330,8 @@ const STEPS=[
   <div><b class="n">110</b> משטרה · <b class="n">119</b> אמבולנס וכיבוי ${sh("help","כרטיס עזרה")}</div>
   <h3>אנשי קשר בכנס</h3>
   <dl class="facts">
-   <dt>מארגן</dt><dd>פרופ׳ מייק קאלן · וואטסאפ <span dir="ltr" class="n">+44 7866 836368</span></dd>
-   <dt>מנהלה</dt><dd>ג׳ייד · admin@judospace.com</dd>
+   <dt>מארגן</dt><dd>פרופ׳ מייק קאלן (Mike Callan) · וואטסאפ <span dir="ltr" class="n">+44 7866 836368</span></dd>
+   <dt>מנהלה</dt><dd>ג׳ייד (Jade) · admin@judospace.com</dd>
   </dl>`}
 ];
 
@@ -427,6 +479,12 @@ document.getElementById("hereA").addEventListener("click",e=>{
  if(e.target.closest("[data-x]"))document.getElementById("here").hidden=true;
 });
 try{if(localStorage.getItem("jp26:loc")==="1")startLoc()}catch(e){}
+</script>
+
+<script>
+document.addEventListener("click",e=>{const b=e.target.closest("[data-term]");if(!b)return;e.preventDefault();e.stopPropagation();const t=TERMS[b.dataset.term];
+ tipH.textContent=t[0];tipEn.textContent=t[1];tipJp.textContent=t[2];tipD.textContent=t[3];tip.hidden=false},true);
+tipX.onclick=()=>tip.hidden=true;
 </script>
 </body>
 </html>
