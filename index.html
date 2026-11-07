@@ -90,6 +90,7 @@ ul.chk li.ck .txt .lbl{text-decoration:line-through}
 .show{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-size:15px;white-space:nowrap}
 dl.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:15px}
 dl.facts dt{color:var(--muted)}
+dl.tl dt{font-variant-numeric:tabular-nums;color:var(--fg);font-weight:600}
 dl.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .n{font-variant-numeric:tabular-nums}
 textarea{width:100%;min-height:64px;background:var(--soft);color:var(--fg);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;font:inherit;font-size:15px;resize:vertical}
@@ -146,6 +147,7 @@ const CARDS={
  nex:{he:"כרטיס נריטה אקספרס לשינג׳וקו, שני אנשים",ja:"成田エクスプレスで\n新宿まで、大人2枚\nお願いします",ro:"Narita Ekusupuresu de Shinjuku made, otona ni-mai onegaishimasu"},
  nexplat:{he:"איפה הרציף של נריטה אקספרס?",ja:"成田エクスプレスの\n乗り場はどこですか？",ro:"Narita Ekusupuresu no noriba wa doko desu ka?"},
  odakyu:{he:"איפה הרציף של קו אודקיו?",ja:"小田急線の乗り場は\nどこですか？",ro:"Odakyū-sen no noriba wa doko desu ka?"},
+ romance:{he:"2 כרטיסי רומנסקאר להון־אצוגי",ja:"ロマンスカーで\n本厚木まで、大人2枚\nお願いします",ro:"Romansukā de Hon-Atsugi made, otona ni-mai onegaishimasu"},
  tsuru:{he:"אנחנו רוצים להגיע לתחנת צורומקי אונסן",ja:"鶴巻温泉駅まで\n行きたいです",ro:"Tsurumaki-Onsen eki made ikitai desu"},
  stoptsuru:{he:"הרכבת הזאת עוצרת בצורומקי אונסן?",ja:"この電車は\n鶴巻温泉に止まりますか？",ro:"Kono densha wa Tsurumaki-Onsen ni tomarimasu ka?"},
  campus:{he:"לקמפוס אוניברסיטת טוקאי, בניין 15",ja:"東海大学 湘南キャンパス\n15号館まで\nお願いします",addr:"神奈川県平塚市北金目4-1-1",ro:"Tōkai Daigaku Shōnan Kyanpasu, jūgo-gōkan made onegaishimasu"},
@@ -165,7 +167,7 @@ const chk=(pre,items)=>`<ul class="chk">${items.map((x,i)=>{const [l,ex]=Array.i
 const STEPS=[
  {id:"prep",t:"לפני היציאה",d:"עד 8.12",html:()=>`
   ${chk("prep",[
-   ["להזמין את הבית ב־Airbnb, 10–14.12","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"],
+   ["להזמין את הבית ב־Airbnb, 10–14.12 (4 לילות)","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"],
    "לשאול את הירומי איך מחממים את הבית",
    "לסגור לינה מ־14.12 ואילך",
    "דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק",
@@ -187,13 +189,25 @@ const STEPS=[
    "ביקורת גבולות ומכס עם קודי ה־QR",
    "להפעיל את ה־eSIM",
    "למשוך ין בכספומט של סבן־אילבן"])}`},
- {id:"toHome",t:"מנריטה לבית בצורומקי אונסן",d:"חמישי 10.12 · כ־2.5–3 שעות",html:()=>`
+ {id:"toHome",t:"מנריטה לבית בצורומקי אונסן",d:"חמישי 10.12 · יציאה ~15:00 · בבית ~18:30",html:()=>`
+  <h3>לוח זמנים משוער</h3>
+  <dl class="facts tl">
+   <dt>13:30</dt><dd>נחיתה</dd>
+   <dt>14:30</dt><dd>יוצאים מהמכס עם המזוודות</dd>
+   <dt>15:00</dt><dd>eSIM, כספומט, כרטיסים בקופה של JR</dd>
+   <dt>15:15</dt><dd>נריטה אקספרס יוצאת (רכבת כל 30–60 דק׳)</dd>
+   <dt>16:45</dt><dd>שינג׳וקו, מעבר לקו אודקיו</dd>
+   <dt>17:10</dt><dd>רכבת אודקיו לכיוון <span class="jp">小田原</span></dd>
+   <dt>18:20</dt><dd>צורומקי אונסן <span class="jp">鶴巻温泉</span></dd>
+   <dt>18:30</dt><dd><b>בבית</b> · צ׳ק־אין עד 22:00, יש מרווח של 3.5 שעות</dd>
+  </dl>
+  <div class="warn">היציאה משינג׳וקו נופלת על שעת העומס של הערב (17:00–19:00). עם מזוודות הרכבות צפופות מאוד. אפשרות נוחה יותר: <b>רומנסקאר</b> משינג׳וקו עד <b>הון־אצוגי</b> <span class="jp">本厚木</span> (מושב שמור, בתוספת תשלום, קונים בקופה של אודקיו), ומשם רכבת רגילה 3 תחנות לצורומקי אונסן.</div>
   <div class="key"><b>את הכרטיס לנריטה אקספרס קונים במקום, לא מראש.</b> קונים לרכבת הקרובה אחרי שיוצאים מהמכס. המושב בכרטיס שמור, עם מספר קרון ומושב.</div>
   ${chk("toHome",[
    ["יורדים לקומת הרכבות B1 ומוצאים את הקופה של JR",sh("jrdesk","לא מוצאים? להראות")],
    ["קונים 2 כרטיסי נריטה אקספרס לשינג׳וקו",sh("nex","להראות בקופה")],
    ["עולים לקרון ולמושב שבכרטיס",sh("nexplat","איפה הרציף?")+" <span class='dur'>כ־85 דק׳</span>"],
-   ["בשינג׳וקו הולכים לפי השלטים הכחולים <span class='jp'>小田急線</span>, בצד המערבי",sh("odakyu")+" <span class='dur'>10–15 דק׳</span>"],
+   ["בשינג׳וקו הולכים לפי השלטים הכחולים <span class='jp'>小田急線</span>, בצד המערבי",sh("odakyu")+" "+sh("romance","כרטיס רומנסקאר")+" <span class='dur'>10–15 דק׳</span>"],
    ["עולים לרכבת לכיוון <span class='jp'>小田原</span>, סוג אקספרס <span class='jp'>急行</span>",sh("stoptsuru","לשאול אם עוצרת")],
    ["יורדים בצורומקי אונסן <span class='jp'>鶴巻温泉</span>","<span class='dur'>כ־65 דק׳ משינג׳וקו</span>"],
    ["7 דק׳ הליכה לבית, צ׳ק־אין עצמי עם תיבת מנעול","<span class='dur'>כתובת וקוד מהירומי</span>"]])}
