@@ -18,6 +18,19 @@ body{margin:0}[hidden]{display:none!important}
 .logo{width:22px;height:22px;border-radius:50%;background:#d6262b;display:inline-block;vertical-align:-3px;margin-inline-end:10px}
 .tools{display:flex;gap:16px;margin-top:12px}
 .tools button{background:none;border:0;padding:0;color:#3d5a80;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:14px;cursor:pointer}
+
+.locbar{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:#73777d}
+.locbar button{background:none;border:1px solid #ececea;border-radius:99px;padding:4px 12px;font:inherit;font-size:14px;cursor:pointer;color:#1d1f22}
+.locbar button.on{border-color:#d6262b;color:#d6262b}
+.locdot{width:8px;height:8px;border-radius:50%;background:#c9c9c4}
+.locbar.on .locdot{background:#d6262b;animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+#here{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:#fff;border:1px solid #d6262b;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:grid;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+#here .hh{font-weight:700}
+#here .hb{font-size:15px}
+#here .ha{display:flex;flex-wrap:wrap;gap:14px}
+#here .ha button{background:none;border:0;padding:0;color:#3d5a80;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:15px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.locbar.on .locdot{animation:none}}
 </style>
 </head>
 <body>
@@ -108,6 +121,9 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
   <div class="tools"><button id="shareBtn">שיתוף</button><button id="installBtn" hidden>התקנה בטלפון</button></div>
   <div class="times"><span>ישראל <b id="cIL">--:--</b></span><span>יפן <b id="cJP">--:--</b></span><span id="cd"></span></div>
 </header>
+<div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">זיהוי מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
+<div style="height:12px"></div>
+<div id="here" hidden role="status" aria-live="polite"><div class="hh" id="hereT"></div><div class="hb" id="hereB"></div><div class="ha" id="hereA"></div></div>
 <div class="acc" id="acc"></div>
 <footer>
   <span>הסימונים וההערות נשמרים בטלפון הזה בלבד. זמני הנסיעה משוערים; ביום עצמו כדאי לבדוק בגוגל מפות.</span>
@@ -329,6 +345,74 @@ addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;ib.hidd
 ib.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;ib.hidden=true};
 document.getElementById("shareBtn").onclick=async()=>{const d={title:"יפן · דצמבר 2026",url:location.href};
  try{if(navigator.share)await navigator.share(d);else{await navigator.clipboard.writeText(location.href);alert("הקישור הועתק")}}catch(e){}};
+</script>
+
+<script>
+/* GPS: works only while the app is open. Finds the nearest trip anchor and jumps to the relevant step. */
+const ANCHORS=[
+ {id:"tlv",lat:32.0003,lng:34.8705,r:1500,name:"נתב״ג"},
+ {id:"narita",lat:35.7647,lng:140.3863,r:1500,name:"נריטה טרמינל 1"},
+ {id:"shinjuku",lat:35.6896,lng:139.7006,r:700,name:"שינג׳וקו"},
+ {id:"tsuru",lat:35.3811,lng:139.2779,r:650,name:"צורומקי אונסן"},
+ {id:"tokai",lat:35.3731,lng:139.2712,r:300,name:"תחנת טוקאי־דאיגקומאה"},
+ {id:"campus",lat:35.3635,lng:139.2745,r:700,name:"קמפוס טוקאי"}
+];
+const isDone=id=>{const s=STEPS.find(x=>x.id===id);return s?stat(s).done:true};
+function adviceFor(a){
+ const jpDay=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Tokyo"});
+ const returning=jpDay>="2026-12-20";
+ switch(a.id){
+  case "tlv":return {step:"dep",b:"טרמינל 3. מסירת מזוודה, ביקורת ביטחון, עלייה למטוס.",cards:[]};
+  case "narita":return returning
+   ?{step:"ret",b:"אל על בטרמינל 1. צ׳ק־אין ומסירת מזוודות.",cards:[]}
+   :{step:isDone("land")?"toHome":"land",b:"אחרי המכס: יורדים לקומה B1, לקופה של JR. קונים 2 כרטיסי נריטה אקספרס לשינג׳וקו.",cards:[["jrdesk","איפה הקופה"],["nex","כרטיס בקופה"]]};
+  case "shinjuku":return returning
+   ?{step:"ret",b:"עוברים ל־JR וקונים נריטה אקספרס לטרמינל 1.",cards:[["jrdesk","איפה הקופה"],["nexback","כרטיס בקופה"]]}
+   :{step:"toHome",b:"עוקבים אחרי השלטים הכחולים 小田急線, בצד המערבי. רכבת לכיוון 小田原, סוג 急行.",cards:[["odakyu","איפה הרציף"],["stoptsuru","עוצרת בצורומקי?"]]};
+  case "tsuru":return !isDone("toHome")
+   ?{step:"toHome",b:"הגעתם. 7 דקות הליכה לבית, צ׳ק־אין עצמי עם תיבת מנעול.",cards:[]}
+   :{step:nextStepId(),b:"לקמפוס: רכבת לכיוון 小田原, תחנה אחת, עד 東海大学前.",cards:[["campus","להראות לנהג"]]};
+  case "tokai":return {step:nextStepId(),b:"הליכה של 15–20 דקות לקמפוס, או מונית.",cards:[["campus","להראות לנהג"],["bldg","איפה בניין 15"]]};
+  case "campus":return {step:nextStepId(),b:"הרצאות: בניין 15, חדר 611. מעשי: הדוג'ו באולם הבודוקאן.",cards:[["bldg","לשאול איפה"]]};
+ }}
+function nextStepId(){const i=nextIdx();return i>=0?STEPS[i].id:null}
+function dist(a,b,c,d){const R=6371e3,t=Math.PI/180,x=(c-a)*t,y=(d-b)*t,h=Math.sin(x/2)**2+Math.cos(a*t)*Math.cos(c*t)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+let watchId=null,lastAnchor=null;
+const locBar=document.getElementById("locbar"),locBtn=document.getElementById("locBtn"),locTxt=document.getElementById("locTxt");
+function onPos(p){
+ const {latitude:la,longitude:lo}=p.coords;
+ let best=null;
+ for(const a of ANCHORS){const d=dist(la,lo,a.lat,a.lng);if(d<=a.r&&(!best||d<best.d))best={a,d}}
+ if(!best){locTxt.textContent="המיקום פעיל · לא ליד נקודה במסלול";return}
+ locTxt.textContent="המיקום פעיל · ליד "+best.a.name;
+ if(lastAnchor===best.a.id)return;
+ lastAnchor=best.a.id;
+ const adv=adviceFor(best.a);if(!adv)return;
+ document.getElementById("hereT").textContent="אתם ליד "+best.a.name;
+ document.getElementById("hereB").textContent=adv.b;
+ document.getElementById("hereA").innerHTML=adv.cards.map(([id,l])=>`<button data-card="${id}">${l}</button>`).join("")+(adv.step?`<button data-goto="${adv.step}">לשלב</button>`:"")+`<button data-x="1">סגור</button>`;
+ document.getElementById("here").hidden=false;
+ if(adv.step){const i=STEPS.findIndex(s=>s.id===adv.step);if(i>=0){setOpen(i);render()}}
+ try{navigator.vibrate&&navigator.vibrate([120,80,120])}catch(e){}
+ try{if("Notification"in window&&Notification.permission==="granted"&&navigator.serviceWorker)navigator.serviceWorker.ready.then(r=>r.showNotification("אתם ליד "+best.a.name,{body:adv.b,icon:"icon-192.png",tag:"here"}))}catch(e){}
+}
+function onErr(e){locTxt.textContent=e.code===1?"אין הרשאת מיקום. לאשר בהגדרות הדפדפן":"לא מצליח לקבל מיקום כרגע"}
+function startLoc(){
+ if(!navigator.geolocation){locTxt.textContent="הדפדפן לא תומך במיקום";return}
+ watchId=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:30000,timeout:20000});
+ locBar.classList.add("on");locBtn.classList.add("on");locBtn.textContent="לכבות";locTxt.textContent="מחפש מיקום…";
+ try{localStorage.setItem("jp26:loc","1")}catch(e){}
+ try{if("Notification"in window&&Notification.permission==="default")Notification.requestPermission()}catch(e){}
+}
+function stopLoc(){if(watchId!==null)navigator.geolocation.clearWatch(watchId);watchId=null;lastAnchor=null;
+ locBar.classList.remove("on");locBtn.classList.remove("on");locBtn.textContent="להפעיל";locTxt.textContent="זיהוי מיקום כבוי";
+ try{localStorage.setItem("jp26:loc","0")}catch(e){}}
+locBtn.onclick=()=>watchId===null?startLoc():stopLoc();
+document.getElementById("hereA").addEventListener("click",e=>{
+ const g=e.target.closest("[data-goto]");if(g){const i=STEPS.findIndex(s=>s.id===g.dataset.goto);setOpen(i);render();document.getElementById(g.dataset.goto).scrollIntoView({behavior:"smooth",block:"start"})}
+ if(e.target.closest("[data-x]"))document.getElementById("here").hidden=true;
+});
+try{if(localStorage.getItem("jp26:loc")==="1")startLoc()}catch(e){}
 </script>
 </body>
 </html>
