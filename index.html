@@ -86,7 +86,7 @@ ul.plain{margin:0;padding-inline-start:18px;display:grid;gap:4px;font-size:15px}
 .card:hover{border-color:var(--accent)}
 .card .he{font-size:14px;color:var(--muted)}
 .card .ja{font-family:var(--jp);font-weight:700;font-size:20px;line-height:1.45;direction:ltr;text-align:right}
-.card .ro{font-size:14px;color:var(--muted)}
+.card .ro{font-size:14px;color:var(--muted);direction:ltr;text-align:right}
 .card .addr{font-size:13px;color:var(--muted);direction:ltr;text-align:right;font-family:var(--jp)}
 .reset{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:13px}
 
@@ -95,6 +95,7 @@ ul.plain{margin:0;padding-inline-start:18px;display:grid;gap:4px;font-size:15px}
 #full .ja{font-family:var(--jp);font-weight:700;font-size:clamp(30px,8.5vw,56px);line-height:1.4;direction:ltr}
 #full .addr{font-family:var(--jp);font-size:clamp(17px,4.5vw,24px);color:#444;direction:ltr}
 #full .he{font-size:15px;color:#777}
+#full .ro{font-size:clamp(15px,4vw,19px);color:#555;direction:ltr}
 #full button{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));inset-inline-start:max(14px,env(safe-area-inset-left,0px));background:#f0f0ee;border:0;border-radius:99px;padding:6px 14px;font-size:15px}
 footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -118,26 +119,27 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
   <button id="close">סגור</button>
   <div class="ja" id="fJa"></div>
   <div class="addr" id="fAddr"></div>
+  <div class="ro" id="fRo"></div>
   <div class="he" id="fHe"></div>
 </div>
 
 <script>
 const CARDS={
- lost:{he:"הלכנו לאיבוד, אפשר עזרה?",ja:"道に迷いました。\n助けていただけますか？",ro:"מיצ׳י ני מאיוֹאימשיטה. טסקֶטֶה איטדקֶמס קא?"},
- jrdesk:{he:"איפה הקופה של JR / נריטה אקספרס?",ja:"JRのきっぷ売り場は\nどこですか？\n成田エクスプレス",ro:"ג׳יי־אר נו קיפּו אוּריבה וָה דוֹקוֹ דֶס קא? נריטה אֶקסופּורֶסו"},
- nex:{he:"כרטיס נריטה אקספרס לשינג׳וקו, שני אנשים",ja:"成田エクスプレスで\n新宿まで、大人2枚\nお願いします",ro:"נריטה אֶקסופּורֶסו דֶה שינג׳וקו מאדֶה, אוֹטוֹנה ני־מאי אוֹנֶגאישימס"},
- nexplat:{he:"איפה הרציף של נריטה אקספרס?",ja:"成田エクスプレスの\n乗り場はどこですか？",ro:"נריטה אֶקסופּורֶסו נו נוֹריבה וָה דוֹקוֹ דֶס קא?"},
- odakyu:{he:"איפה הרציף של קו אודקיו?",ja:"小田急線の乗り場は\nどこですか？",ro:"אודקיו־סֶן נו נוֹריבה וָה דוֹקוֹ דֶס קא?"},
- tsuru:{he:"אנחנו רוצים להגיע לתחנת צורומקי אונסן",ja:"鶴巻温泉駅まで\n行きたいです",ro:"צורומאקי אונסן אֶקי מאדֶה איקיטאי דֶס"},
- stoptsuru:{he:"הרכבת הזאת עוצרת בצורומקי אונסן?",ja:"この電車は\n鶴巻温泉に止まりますか？",ro:"קוֹנוֹ דֶנשה וָה צורומאקי אונסן ני טוֹמרימס קא?"},
- campus:{he:"לקמפוס אוניברסיטת טוקאי, בניין 15",ja:"東海大学 湘南キャンパス\n15号館まで\nお願いします",addr:"神奈川県平塚市北金目4-1-1",ro:"טוֹקאי דאיגקו שוֹנאן קיאנפּסו, ג׳וּגוֹ־גוֹקאן מאדֶה אוֹנֶגאישימס"},
- bldg:{he:"איפה בניין 15? איפה הבודוקאן?",ja:"15号館はどこですか？\n武道館はどこですか？",ro:"ג׳וּגוֹ־גוֹקאן וָה דוֹקוֹ דֶס קא? בּוּדוֹקאן וָה דוֹקוֹ דֶס קא?"},
- tokaist:{he:"לתחנת טוקאי־דאיגקומאה, בבקשה",ja:"東海大学前駅まで\nお願いします",ro:"טוֹקאי־דאיגקומאֶה אֶקי מאדֶה אוֹנֶגאישימס"},
- nexback:{he:"כרטיס נריטה אקספרס לנריטה טרמינל 1, שני אנשים",ja:"成田エクスプレスで\n成田空港 第1ターミナルまで\n大人2枚お願いします",ro:"נריטה קוּקוֹ דאי־איצ׳י טָמינרו מאדֶה, אוֹטוֹנה ני־מאי אוֹנֶגאישימס"},
- airport:{he:"הרכבת הזאת נוסעת לנמל התעופה נריטה?",ja:"この電車は\n成田空港に行きますか？",ro:"קוֹנוֹ דֶנשה וָה נריטה קוּקוֹ ני איקימס קא?"},
- english:{he:"אתם מדברים אנגלית?",ja:"英語を話せますか？",ro:"אֵייגוֹ אוֹ הנסֶמס קא?"},
- write:{he:"אפשר לכתוב את זה?",ja:"ここに書いて\nいただけますか？",ro:"קוֹקוֹ ני קאיטֶה איטדקֶמס קא?"},
- help:{he:"חירום: בבקשה תזמינו אמבולנס",ja:"救急車を\n呼んでください",addr:"119",ro:"קיוּקיוּשה אוֹ יוֹנדֶה קודסאי"}
+ lost:{he:"הלכנו לאיבוד, אפשר עזרה?",ja:"道に迷いました。\n助けていただけますか？",ro:"Michi ni mayoimashita. Tasukete itadakemasu ka?"},
+ jrdesk:{he:"איפה הקופה של JR / נריטה אקספרס?",ja:"JRのきっぷ売り場は\nどこですか？\n成田エクスプレス",ro:"JR no kippu uriba wa doko desu ka? Narita Ekusupuresu"},
+ nex:{he:"כרטיס נריטה אקספרס לשינג׳וקו, שני אנשים",ja:"成田エクスプレスで\n新宿まで、大人2枚\nお願いします",ro:"Narita Ekusupuresu de Shinjuku made, otona ni-mai onegaishimasu"},
+ nexplat:{he:"איפה הרציף של נריטה אקספרס?",ja:"成田エクスプレスの\n乗り場はどこですか？",ro:"Narita Ekusupuresu no noriba wa doko desu ka?"},
+ odakyu:{he:"איפה הרציף של קו אודקיו?",ja:"小田急線の乗り場は\nどこですか？",ro:"Odakyū-sen no noriba wa doko desu ka?"},
+ tsuru:{he:"אנחנו רוצים להגיע לתחנת צורומקי אונסן",ja:"鶴巻温泉駅まで\n行きたいです",ro:"Tsurumaki-Onsen eki made ikitai desu"},
+ stoptsuru:{he:"הרכבת הזאת עוצרת בצורומקי אונסן?",ja:"この電車は\n鶴巻温泉に止まりますか？",ro:"Kono densha wa Tsurumaki-Onsen ni tomarimasu ka?"},
+ campus:{he:"לקמפוס אוניברסיטת טוקאי, בניין 15",ja:"東海大学 湘南キャンパス\n15号館まで\nお願いします",addr:"神奈川県平塚市北金目4-1-1",ro:"Tōkai Daigaku Shōnan Kyanpasu, jūgo-gōkan made onegaishimasu"},
+ bldg:{he:"איפה בניין 15? איפה הבודוקאן?",ja:"15号館はどこですか？\n武道館はどこですか？",ro:"Jūgo-gōkan wa doko desu ka? Budōkan wa doko desu ka?"},
+ tokaist:{he:"לתחנת טוקאי־דאיגקומאה, בבקשה",ja:"東海大学前駅まで\nお願いします",ro:"Tōkai-Daigakumae eki made onegaishimasu"},
+ nexback:{he:"כרטיס נריטה אקספרס לנריטה טרמינל 1, שני אנשים",ja:"成田エクスプレスで\n成田空港 第1ターミナルまで\n大人2枚お願いします",ro:"Narita Kūkō dai-ichi tāminaru made, otona ni-mai onegaishimasu"},
+ airport:{he:"הרכבת הזאת נוסעת לנמל התעופה נריטה?",ja:"この電車は\n成田空港に行きますか？",ro:"Kono densha wa Narita Kūkō ni ikimasu ka?"},
+ english:{he:"אתם מדברים אנגלית?",ja:"英語を話せますか？",ro:"Eigo o hanasemasu ka?"},
+ write:{he:"אפשר לכתוב את זה?",ja:"ここに書いて\nいただけますか？",ro:"Koko ni kaite itadakemasu ka?"},
+ help:{he:"חירום: בבקשה תזמינו אמבולנס",ja:"救急車を\n呼んでください",addr:"119",ro:"Kyūkyūsha o yonde kudasai"}
 };
 const sh=(id,label)=>`<button class="show" data-card="${id}">${label||"להראות"}</button>`;
 /* checklist: each item is [label, extra html] or a plain string */
@@ -300,7 +302,7 @@ const full=document.getElementById("full");
 document.addEventListener("click",e=>{const b=e.target.closest("[data-card]");if(!b)return;e.preventDefault();const c=CARDS[b.dataset.card];if(!c)return;
   document.getElementById("fJa").innerHTML=c.ja.replace(/\n/g,"<br>");
   document.getElementById("fAddr").textContent=c.addr||"";
-  document.getElementById("fHe").textContent=c.he+"  ·  "+c.ro;
+  document.getElementById("fRo").textContent=c.ro;document.getElementById("fHe").textContent=c.he;
   full.hidden=false;try{navigator.wakeLock&&navigator.wakeLock.request("screen").catch(()=>{})}catch(e){}
   document.getElementById("close").focus()});
 document.getElementById("close").onclick=()=>full.hidden=true;
