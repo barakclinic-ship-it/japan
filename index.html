@@ -603,11 +603,11 @@ function wxDraw(d,stale){
  const inTrip=today>=TRIP_FROM&&today<=TRIP_TO;
  const show=days.filter(x=>inTrip?x.t>=today:(x.t>=TRIP_FROM&&x.t<=TRIP_TO));
  if(!show.length){
-  wxChip.innerHTML=`<span class="i">❄</span>11°/3° <span class="l">טוקיו בדצמבר</span>`;
+  wxChip.innerHTML=`<span class="i">❄</span><span dir="ltr">11° / 3°</span> <span class="l">טוקיו בדצמבר</span>`;
   wxPop.innerHTML=`<div class="note">תחזית לימי הנסיעה תופיע כאן כשבועיים לפני. בדצמבר בטוקיו בדרך כלל יבש ושמשי, 9–12° ביום ו־1–5° בלילה.</div>`;
  }else{
   const f=show[0],[i,l]=WMO(f.c),dt=new Date(f.t+"T12:00:00+09:00");
-  wxChip.innerHTML=`<span class="i" aria-label="${l}">${i}</span>${f.mx}°/${f.mn}° <span class="l">טוקיו ${inTrip?"היום":dt.getUTCDate()+"."+(dt.getUTCMonth()+1)}</span>`;
+  wxChip.innerHTML=`<span class="i" aria-label="${l}">${i}</span><span dir="ltr">${f.mx}° / ${f.mn}°</span> <span class="l">טוקיו ${inTrip?"היום":dt.getUTCDate()+"."+(dt.getUTCMonth()+1)}</span>`;
   const rainy=show.filter(x=>x.p>=50).map(x=>x.t.slice(8)*1+".12");
   wxPop.innerHTML=`<div class="row">${show.map(x=>{const [ic,lb]=WMO(x.c),t=new Date(x.t+"T12:00:00+09:00");
    return `<div class="d ${x.t>=TRIP_FROM&&x.t<=TRIP_TO?"trip":""}" title="${lb}"><div>${HEDAY[t.getUTCDay()]} ${t.getUTCDate()}.${t.getUTCMonth()+1}</div><div class="i">${ic}</div><div><b>${x.mx}°</b> <span>${x.mn}°</span></div>${x.p!=null?`<div>${x.p}%☂</div>`:""}</div>`}).join("")}</div>
