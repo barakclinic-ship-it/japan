@@ -59,6 +59,24 @@ dl.gloss dd{margin:2px 0 0;color:#73777d}
 .wx .tabs{display:flex;gap:4px}
 .wx .tabs button{background:none;border:1px solid #ececea;border-radius:99px;padding:2px 10px;font:inherit;font-size:13px;cursor:pointer;color:#73777d}
 .wx .tabs button[aria-pressed="true"]{border-color:#1d1f22;color:#1d1f22}
+
+.srch{position:relative;margin-bottom:12px}
+.srch input{width:100%;font:inherit;font-size:16px;padding:10px 38px 10px 12px;border:1px solid #ececea;border-radius:10px;background:#f6f6f4;color:#1d1f22}
+.srch input:focus{outline:none;border-color:#3d5a80;background:#fff}
+.srch .ic{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);color:#73777d;pointer-events:none;font-size:15px}
+.srch .clr{position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:#73777d;font-size:18px;cursor:pointer;padding:4px 8px}
+#sres{display:grid;gap:2px;margin-bottom:14px}
+#sres .hd{font-size:12px;color:#73777d;letter-spacing:.04em;margin:8px 0 2px}
+#sres button.r{display:block;width:100%;text-align:start;background:none;border:0;border-bottom:1px solid #ececea;padding:9px 2px;font:inherit;cursor:pointer;color:#1d1f22}
+#sres button.r:hover{background:#f6f6f4}
+#sres .r .w{font-size:12px;color:#3d5a80}
+#sres .r .x{font-size:15px}
+#sres .r .y{font-size:13px;color:#73777d;direction:ltr;unicode-bidi:isolate}
+#sres mark{background:#fdeeb5;color:inherit;border-radius:2px}
+#sres .none{color:#73777d;font-size:15px;padding:8px 0}
+.flash{animation:flash 1.8s ease-out}
+@keyframes flash{0%,40%{background:#fdeeb5}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;background:#fdeeb5}}
 </style>
 </head>
 <body>
@@ -153,6 +171,8 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 <div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">זיהוי מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
 <div class="wx" id="wx"><div class="wh"><b>מזג אוויר</b><div class="tabs" id="wxTabs"></div></div><div class="row" id="wxRow"><div class="note">טוען תחזית…</div></div><div class="note" id="wxNote"></div></div>
 <div style="height:12px"></div>
+<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש: תחנה, כרטיס, מילה ביפנית…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button></div>
+<div id="sres" hidden></div>
 <div id="here" hidden role="status" aria-live="polite"><div class="hh" id="hereT"></div><div class="hb" id="hereB"></div><div class="ha" id="hereA"></div></div>
 <div class="acc" id="acc"></div>
 <footer>
@@ -565,6 +585,52 @@ async function wxLoad(){
   if(d)wxDraw(d,true);else{wxRow.innerHTML="";wxNote.textContent="אין חיבור לאינטרנט כרגע, אז אין תחזית."}}
 }
 wxDrawTabs();wxLoad();setInterval(wxLoad,3*3600e3);
+</script>
+
+<script>
+/* Search across stages, show-cards and the glossary. Matches Hebrew, English, romaji (with or without long vowels) and Japanese. */
+const norm=t=>(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f\u0591-\u05c7]/g,"").replace(/[׳״'"`’\-–—·.,:;()?!]/g," ").replace(/\s+/g," ").trim();
+const SEL="li,.warn,.key,dd,.sub,.big";
+let IDX=null;
+function buildIdx(){
+ IDX=[];
+ STEPS.forEach((st,si)=>{if(st.always)return;const box=document.createElement("div");box.innerHTML=st.html();
+  box.querySelectorAll(SEL).forEach((el,ei)=>{const tx=el.textContent.replace(/\s+/g," ").trim();if(tx.length>2)IDX.push({k:"step",si,ei,title:st.t,txt:tx,n:norm(tx+" "+st.t)})});
+  IDX.push({k:"step",si,ei:-1,title:st.t,txt:st.d,n:norm(st.t+" "+st.d)})});
+ Object.entries(CARDS).forEach(([id,c])=>IDX.push({k:"card",id,title:c.he,txt:c.ro,ja:c.ja.replace(/\n/g,""),n:norm([c.he,c.ro,c.ja,c.addr].join(" "))}));
+ Object.entries(TERMS).forEach(([id,t])=>IDX.push({k:"term",id,title:t[0],txt:t[1],ja:t[2],n:norm(t.join(" "))}));
+}
+const esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function hl(t,words){let h=esc(t);for(const w of words){if(w.length<2)continue;const re=new RegExp("("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig");h=h.replace(re,"<mark>$1</mark>")}return h}
+function snippet(t,w){if(t.length<=110)return t;const i=Math.max(0,norm(t).indexOf(w)-40);return (i>0?"…":"")+t.slice(i,i+110)+"…"}
+const q=document.getElementById("q"),sres=document.getElementById("sres"),qClr=document.getElementById("qClr"),accEl=document.getElementById("acc");
+function search(){
+ const raw=q.value.trim();qClr.hidden=!raw;
+ if(!raw){sres.hidden=true;accEl.hidden=false;return}
+ if(!IDX)buildIdx();
+ const words=norm(raw).split(" ").filter(Boolean);
+ const hits=IDX.filter(x=>words.every(w=>x.n.includes(w)));
+ const groups=[["card","כרטיסים להראות"],["term","מקומות ומונחים"],["step","בשלבים"]];
+ let html="";
+ for(const [k,lab] of groups){const g=hits.filter(h=>h.k===k).slice(0,k==="step"?12:8);if(!g.length)continue;
+  html+=`<div class="hd">${lab}</div>`+g.map(h=>{
+   if(k==="card")return `<button class="r" data-card="${h.id}"><div class="x">${hl(h.title,words)}</div><div class="y"><span class="jp">${esc(h.ja)}</span> · ${hl(h.txt,words)}</div></button>`;
+   if(k==="term")return `<button class="r" data-term="${h.id}"><div class="x">${hl(h.title,words)} <span class="y">${hl(h.txt,words)}</span></div>${h.ja?`<div class="y"><span class="jp">${esc(h.ja)}</span></div>`:""}</button>`;
+   return `<button class="r" data-sgo="${h.si}:${h.ei}"><div class="w">${esc(h.title)}</div><div class="x">${hl(snippet(h.txt,words[0]),words)}</div></button>`}).join("")}
+ sres.innerHTML=html||`<div class="none">לא נמצא. אפשר לנסות בעברית, באנגלית או ביפנית.</div>`;
+ sres.hidden=false;accEl.hidden=true;
+}
+q.addEventListener("input",search);
+qClr.onclick=()=>{q.value="";search();q.focus()};
+q.addEventListener("keydown",e=>{if(e.key==="Escape"){q.value="";search()}});
+sres.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)return;
+ const [si,ei]=b.dataset.sgo.split(":").map(Number);
+ q.value="";search();setOpen(si);render();
+ const stEl=document.getElementById(STEPS[si].id);
+ const target=ei>=0?stEl.querySelectorAll(".body "+SEL.split(",").join(",.body "))[ei]:stEl;
+ (target||stEl).scrollIntoView({behavior:"smooth",block:"center"});
+ if(target){target.classList.remove("flash");void target.offsetWidth;target.classList.add("flash")}
+});
 </script>
 </body>
 </html>
