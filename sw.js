@@ -1,4 +1,4 @@
-const C="japan-v9";
+const C="japan-v10";
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(["./","index.html","manifest.json","icon.svg","icon-192.png","icon-512.png"])))});
 self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));
 // network first, so every push shows up right away; cache when offline (e.g. on the plane)

@@ -90,6 +90,17 @@ dl.gloss dd{margin:2px 0 0;color:#73777d}
 #ocrBox .hits .en{font-size:13px;color:#3d5a80;direction:ltr;unicode-bidi:isolate}
 #ocrBox .x{justify-self:start;background:none;border:0;color:#73777d;text-decoration:underline;font:inherit;font-size:13px;cursor:pointer;padding:0}
 .bar2{height:4px;background:#ececea;border-radius:4px;overflow:hidden}.bar2 i{display:block;height:100%;width:0;background:#3d5a80;transition:width .2s}
+
+.wxc{position:absolute;top:30px;inset-inline-end:0;background:none;border:1px solid #ececea;border-radius:99px;padding:3px 10px;font:inherit;font-size:13px;color:#1d1f22;cursor:pointer;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.wxc .i{font-size:15px}.wxc .l{color:#73777d;font-size:12px}
+.wxp{position:absolute;top:62px;inset-inline-end:0;z-index:8;background:#fff;border:1px solid #ececea;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:10px;max-width:min(92vw,520px);display:grid;gap:6px}
+.wxp .row{display:flex;gap:6px;overflow-x:auto}
+.wxp .d{flex:0 0 auto;min-width:56px;text-align:center;font-size:12px;line-height:1.35;font-variant-numeric:tabular-nums;border:1px solid #ececea;border-radius:8px;padding:4px 6px}
+.wxp .d.trip{background:#f2f5f9;border-color:#c9d3e1}
+.wxp .d .i{font-size:17px}
+.wxp .d span{color:#73777d}
+.wxp .note{font-size:12px;color:#73777d}
+h1{padding-inline-end:120px}
 </style>
 </head>
 <body>
@@ -175,14 +186,16 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 </style>
 
 <div class="wrap">
-<header>
+<header style="position:relative">
+  <button id="wxChip" class="wxc" hidden aria-expanded="false"></button>
+  <div id="wxPop" class="wxp" hidden></div>
   <h1><span class="logo" aria-hidden="true"></span>יפן · דצמבר 2026</h1>
   <div class="meta">ברק ועמית · כנס נפילות בטוחות, אוניברסיטת טוקאי</div>
   <div class="tools"><button id="shareBtn">שיתוף</button><button id="installBtn" hidden>התקנה בטלפון</button></div>
   <div class="times"><span>ישראל <b id="cIL">--:--</b></span><span>יפן <b id="cJP">--:--</b></span><span id="cd"></span></div>
 </header>
 <div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">זיהוי מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
-<div class="wx" id="wx"><div class="wh"><b>מזג אוויר</b><div class="tabs" id="wxTabs"></div></div><div class="row" id="wxRow"><div class="note">טוען תחזית…</div></div><div class="note" id="wxNote"></div></div>
+
 <div style="height:12px"></div>
 <div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש: תחנה, כרטיס, מילה ביפנית…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="cam" id="camBtn" type="button">צילום שלט</button><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button><input type="file" id="camIn" accept="image/*" capture="environment" hidden></div>
 <div id="ocrBox" hidden></div>
@@ -579,45 +592,37 @@ tipX.onclick=()=>tip.hidden=true;
 </script>
 
 <script>
-/* Weather: Open-Meteo (free, no key). Live forecast covers 16 days; before that, December averages. Last result kept for offline. */
-const WXP=[
- {id:"hadano",name:"הבית והכנס",en:"Hadano",lat:35.381,lng:139.278},
- {id:"tokyo",name:"טוקיו",en:"Tokyo",lat:35.690,lng:139.700}
-];
+/* Weather: Tokyo only, as a small chip in the header. Tap for the days. Open-Meteo, no key; last result kept for offline. */
 const TRIP_FROM="2026-12-10",TRIP_TO="2026-12-24";
 const WMO=c=>c===0?["☀","בהיר"]:c<=2?["⛅","מעונן חלקית"]:c===3?["☁","מעונן"]:c<=48?["🌫","ערפל"]:c<=57?["🌦","טפטוף"]:c<=67?["☂","גשם"]:c<=77?["❄","שלג"]:c<=82?["☂","ממטרים"]:c<=86?["❄","שלג"]:["⛈","סופה"];
 const HEDAY=["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
-let wxPlace=(()=>{try{return localStorage.getItem("jp26:wxp")||"hadano"}catch(e){return "hadano"}})();
-const wxTabs=document.getElementById("wxTabs"),wxRow=document.getElementById("wxRow"),wxNote=document.getElementById("wxNote");
-function wxDrawTabs(){wxTabs.innerHTML=WXP.map(p=>`<button data-p="${p.id}" aria-pressed="${p.id===wxPlace}">${p.name} <span style="direction:ltr;unicode-bidi:isolate">${p.en}</span></button>`).join("")}
-wxTabs.onclick=e=>{const b=e.target.closest("[data-p]");if(!b)return;wxPlace=b.dataset.p;try{localStorage.setItem("jp26:wxp",wxPlace)}catch(e){}wxDrawTabs();wxLoad()};
+const wxChip=document.getElementById("wxChip"),wxPop=document.getElementById("wxPop");
 function wxDraw(d,stale){
  const days=d.daily.time.map((t,i)=>({t,mx:Math.round(d.daily.temperature_2m_max[i]),mn:Math.round(d.daily.temperature_2m_min[i]),p:d.daily.precipitation_probability_max?.[i],c:d.daily.weather_code[i]}));
- const todayJP=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Tokyo"});
- const inTrip=todayJP>=TRIP_FROM&&todayJP<=TRIP_TO;
- const show=days.filter(x=>inTrip?x.t>=todayJP:(x.t>=TRIP_FROM&&x.t<=TRIP_TO));
- const lastDay=days[days.length-1].t;
+ const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Tokyo"});
+ const inTrip=today>=TRIP_FROM&&today<=TRIP_TO;
+ const show=days.filter(x=>inTrip?x.t>=today:(x.t>=TRIP_FROM&&x.t<=TRIP_TO));
  if(!show.length){
-  wxRow.innerHTML=`<div class="d"><div class="i">❄</div><div class="t"><b>11°</b> <span>3°</span></div><div>ממוצע דצמבר</div></div>`;
-  const avail=new Date(new Date(TRIP_FROM)-15*864e5).toLocaleDateString("he-IL",{day:"numeric",month:"numeric"});
-  wxNote.textContent=`התחזית לימי הנסיעה תופיע כאן מ־${avail} בערך. בינתיים: בדצמבר בדרך כלל יבש ושמשי, 9–12° ביום ו־1–5° בלילה. בבקרים קר.`;
-  return}
- wxRow.innerHTML=show.map(x=>{const [i,l]=WMO(x.c);const dt=new Date(x.t+"T12:00:00+09:00");const trip=x.t>=TRIP_FROM&&x.t<=TRIP_TO;
-  return `<div class="d ${trip?"trip":""} ${x.p>=50?"rain":""}" title="${l}"><div>${HEDAY[dt.getUTCDay()]} ${dt.getUTCDate()}.${dt.getUTCMonth()+1}</div><div class="i" aria-label="${l}">${i}</div><div class="t"><b>${x.mx}°</b> <span>${x.mn}°</span></div>${x.p!=null?`<div class="p">${x.p}%☂</div>`:""}</div>`}).join("");
- const rainy=show.filter(x=>x.p>=50).map(x=>new Date(x.t+"T12:00:00+09:00").getUTCDate()+".12");
- const cold=Math.min(...show.map(x=>x.mn));
- wxNote.textContent=(stale?"תחזית שמורה (אין חיבור). ":"")+
-  (show[show.length-1].t<TRIP_TO&&lastDay<TRIP_TO&&!inTrip?"התחזית מגיעה עד "+lastDay.slice(8)+"."+lastDay.slice(5,7)+". ":"")+
-  (rainy.length?"מטריה ב־"+rainy.join(", ")+". ":"")+(cold<=3?"לילות קרים, עד "+cold+"°. ":"");
+  wxChip.innerHTML=`<span class="i">❄</span>11°/3° <span class="l">טוקיו בדצמבר</span>`;
+  wxPop.innerHTML=`<div class="note">תחזית לימי הנסיעה תופיע כאן כשבועיים לפני. בדצמבר בטוקיו בדרך כלל יבש ושמשי, 9–12° ביום ו־1–5° בלילה.</div>`;
+ }else{
+  const f=show[0],[i,l]=WMO(f.c),dt=new Date(f.t+"T12:00:00+09:00");
+  wxChip.innerHTML=`<span class="i" aria-label="${l}">${i}</span>${f.mx}°/${f.mn}° <span class="l">טוקיו ${inTrip?"היום":dt.getUTCDate()+"."+(dt.getUTCMonth()+1)}</span>`;
+  const rainy=show.filter(x=>x.p>=50).map(x=>x.t.slice(8)*1+".12");
+  wxPop.innerHTML=`<div class="row">${show.map(x=>{const [ic,lb]=WMO(x.c),t=new Date(x.t+"T12:00:00+09:00");
+   return `<div class="d ${x.t>=TRIP_FROM&&x.t<=TRIP_TO?"trip":""}" title="${lb}"><div>${HEDAY[t.getUTCDay()]} ${t.getUTCDate()}.${t.getUTCMonth()+1}</div><div class="i">${ic}</div><div><b>${x.mx}°</b> <span>${x.mn}°</span></div>${x.p!=null?`<div>${x.p}%☂</div>`:""}</div>`}).join("")}</div>
+   <div class="note">${stale?"תחזית שמורה, בלי חיבור. ":""}${rainy.length?"מטריה ב־"+rainy.join(", ")+".":"בלי גשם צפוי."}</div>`;
+ }
+ wxChip.hidden=false;
 }
+wxChip.onclick=()=>{wxPop.hidden=!wxPop.hidden;wxChip.setAttribute("aria-expanded",!wxPop.hidden)};
+document.addEventListener("click",e=>{if(!wxPop.hidden&&!e.target.closest("#wxPop,#wxChip")){wxPop.hidden=true;wxChip.setAttribute("aria-expanded","false")}});
 async function wxLoad(){
- const p=WXP.find(x=>x.id===wxPlace)||WXP[0];
- const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16`;
- try{const r=await fetch(url);if(!r.ok)throw 0;const d=await r.json();try{localStorage.setItem("jp26:wx:"+p.id,JSON.stringify(d))}catch(e){}wxDraw(d,false)}
- catch(e){let d=null;try{d=JSON.parse(localStorage.getItem("jp26:wx:"+p.id))}catch(_){}
-  if(d)wxDraw(d,true);else{wxRow.innerHTML="";wxNote.textContent="אין חיבור לאינטרנט כרגע, אז אין תחזית."}}
+ const url="https://api.open-meteo.com/v1/forecast?latitude=35.690&longitude=139.700&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16";
+ try{const r=await fetch(url);if(!r.ok)throw 0;const d=await r.json();try{localStorage.setItem("jp26:wx:tokyo",JSON.stringify(d))}catch(e){}wxDraw(d,false)}
+ catch(e){let d=null;try{d=JSON.parse(localStorage.getItem("jp26:wx:tokyo"))}catch(_){}if(d)wxDraw(d,true)}
 }
-wxDrawTabs();wxLoad();setInterval(wxLoad,3*3600e3);
+wxLoad();setInterval(wxLoad,3*3600e3);
 </script>
 
 <script>
