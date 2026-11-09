@@ -40,6 +40,7 @@ body{margin:0}[hidden]{display:none!important}
 #tip .en{color:#3d5a80;direction:ltr;unicode-bidi:isolate;font-weight:600}
 #tip .jp{font-size:20px}
 #tip .x{justify-self:start;background:#f3f3f1;border:0;border-radius:99px;padding:4px 12px;font:inherit;font-size:14px;cursor:pointer}
+.rj{font-size:.88em;color:#3d5a80;direction:ltr;unicode-bidi:isolate;font-style:italic}
 dl.gloss{margin:0;display:grid;gap:10px;font-size:15px}
 dl.gloss dt .en{color:#3d5a80;direction:ltr;unicode-bidi:isolate}
 dl.gloss dd{margin:2px 0 0;color:#73777d}
@@ -206,7 +207,8 @@ const TERMS={
  vjw:["Visit Japan Web","Visit Japan Web","","אתר רשמי של ממשלת יפן (vjw-lp.digital.go.jp). ממלאים בו מראש, בבית, את טופס ההגירה ואת הצהרת המכס, ומקבלים שני ריבועי QR. בשדה סורקים אותם בביקורת הגבולות ובמכס במקום למלא טפסים בכתב יד. בלי אינטרנט בשדה, צריך צילום מסך שלהם."]
 };
 const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
-const J=s=>`<span class="jp">${s}</span>`;
+const JR={"小田原":"Odawara","鶴巻温泉":"Tsurumaki-Onsen","東海大学前":"Tōkai-Daigakumae","各駅停車":"Kakueki-teisha","片瀬江ノ島":"Katase-Enoshima","小田急線":"Odakyū-sen","急行":"Kyūkō","快速急行":"Kaisoku-kyūkō","成田空港":"Narita Kūkō","本厚木":"Hon-Atsugi","新宿":"Shinjuku","第1ターミナル":"Dai-ichi Tāminaru","北口":"Kita-guchi","コインロッカー":"Koin rokkā","ロマンスカー":"Romansukā"};
+const J=s=>`<span class="jp">${s}</span>${JR[s]?` <span class="rj">${JR[s]}</span>`:""}`;
 
 const STEPS=[
  {id:"prep",t:"לפני היציאה",d:"עד 8.12",html:()=>`
@@ -223,7 +225,27 @@ const STEPS=[
    "מתאם חשמל לשקע אמריקאי שטוח (Type A)",
    "ג'ודוגי לבן",
    "המצגות ב־PowerPoint על דיסק און קי",
-   "צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"])}`},
+   "צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"])}
+  <h3>אפליקציות להתקין בבית</h3>
+  ${chk("apps",[
+   ["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה",""],
+   ["<b>Google Translate</b>: להוריד את השפה היפנית לשימוש אופליין. מצב מצלמה מתרגם שלטים ותפריטים",""],
+   ["<b>Japan Transit Planner</b> (Jorudan) או <b>NAVITIME</b>: מתכנן רכבות יפני, מדויק יותר בסוגי הרכבות",""],
+   ["<b>Suica</b>: באייפון דרך Apple Wallet. באנדרואיד: Welcome Suica Mobile, או כרטיס פיזי בשדה",""],
+   ["<b>esimo</b>: להתקין את ה־eSIM בבית, על WiFi",""],
+   ["<b>Airbnb</b>: הכתובת, קוד הכניסה וההודעות להירומי",""],
+   ["<b>EL AL</b>: צ'ק־אין וכרטיס עלייה למטוס",""],
+   ["<b>GO</b>: הזמנת מוניות ביפן, עם תשלום באשראי",""],
+   ["<b>Safety tips</b>: אפליקציה רשמית של יפן להתראות על רעידות אדמה, באנגלית",""],
+   ["<b>WhatsApp</b>: קשר עם מייק מהכנס",""],
+   ["האפליקציה הזו מותקנת בטלפון, וזיהוי המיקום מופעל",""]])}
+  <h3>תיק עלייה למטוס</h3>
+  <dl class="facts">
+   <dt>טרולי</dt><dd>עד <b>8 ק״ג</b>, עד 56×45×25 ס״מ</dd>
+   <dt>תיק אישי</dt><dd>קטן, מתחת למושב (תיק גב קטן או תיק צד)</dd>
+   <dt>בכרטיס שלך</dt><dd>הלוך: מזוודה אחת לבטן · חזור: 2 מזוודות</dd>
+  </dl>
+  <div class="warn">אם נוסעים בלי מזוודה לבטן, הכול צריך להיכנס ל־8 ק״ג, כולל ג'ודוגי. נוזלים עד 100 מ״ל בשקית שקופה. סוללות ומטען נייד רק בתיק העלייה. כדאי לוודא באתר של אל על, כי הכללים משתנים לפי סוג הכרטיס.</div>`},
  {id:"dep",t:"המראה מנתב״ג",d:"רביעי 9.12 · 19:00",html:()=>`
   <div><div class="big">19:00</div><div class="sub">טיסה LY 091 · טרמינל 3 · מושב 44B · מזוודה אחת · הזמנה 9XSQI6</div></div>
   ${chk("dep",["להגיע לטרמינל 3 עד 16:00","מסירת מזוודה וביקורת ביטחון","עלייה למטוס"])}`},
@@ -434,10 +456,10 @@ function adviceFor(a){
    :{step:isDone("land")?"toHome":"land",b:"אחרי המכס: יורדים לקומה B1, לקופה של JR. קונים 2 כרטיסי נריטה אקספרס לשינג׳וקו.",cards:[["jrdesk","איפה הקופה"],["nex","כרטיס בקופה"]]};
   case "shinjuku":return returning
    ?{step:"ret",b:"עוברים ל־JR וקונים נריטה אקספרס לטרמינל 1.",cards:[["jrdesk","איפה הקופה"],["nexback","כרטיס בקופה"]]}
-   :{step:"toHome",b:"עוקבים אחרי השלטים הכחולים 小田急線, בצד המערבי. רכבת לכיוון 小田原, סוג 急行.",cards:[["odakyu","איפה הרציף"],["stoptsuru","עוצרת בצורומקי?"]]};
+   :{step:"toHome",b:"עוקבים אחרי השלטים הכחולים 小田急線 (Odakyū-sen), בצד המערבי. רכבת לכיוון 小田原 (Odawara), סוג 急行 (Kyūkō).",cards:[["odakyu","איפה הרציף"],["stoptsuru","עוצרת בצורומקי?"]]};
   case "tsuru":return !isDone("toHome")
    ?{step:"toHome",b:"הגעתם. 7 דקות הליכה לבית, צ׳ק־אין עצמי עם תיבת מנעול.",cards:[]}
-   :{step:nextStepId(),b:"לקמפוס: רכבת לכיוון 小田原, תחנה אחת, עד 東海大学前.",cards:[["campus","להראות לנהג"]]};
+   :{step:nextStepId(),b:"לקמפוס: רכבת לכיוון 小田原 (Odawara), תחנה אחת, עד 東海大学前 (Tōkai-Daigakumae).",cards:[["campus","להראות לנהג"]]};
   case "tokai":return {step:nextStepId(),b:"הליכה של 15–20 דקות לקמפוס, או מונית.",cards:[["campus","להראות לנהג"],["bldg","איפה בניין 15"]]};
   case "campus":return {step:nextStepId(),b:"הרצאות: בניין 15, חדר 611. מעשי: הדוג'ו באולם הבודוקאן.",cards:[["bldg","לשאול איפה"]]};
  }}
