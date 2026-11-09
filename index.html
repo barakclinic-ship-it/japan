@@ -44,6 +44,21 @@ body{margin:0}[hidden]{display:none!important}
 dl.gloss{margin:0;display:grid;gap:10px;font-size:15px}
 dl.gloss dt .en{color:#3d5a80;direction:ltr;unicode-bidi:isolate}
 dl.gloss dd{margin:2px 0 0;color:#73777d}
+
+.wx{margin-top:14px;display:grid;gap:6px}
+.wx .wh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;color:#73777d}
+.wx .wh b{color:#1d1f22;font-size:15px}
+.wx .row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.wx .d{flex:0 0 auto;min-width:64px;border:1px solid #ececea;border-radius:10px;padding:6px 8px;text-align:center;font-size:13px;line-height:1.35;font-variant-numeric:tabular-nums}
+.wx .d.trip{border-color:#c9d3e1;background:#f2f5f9}
+.wx .d.rain .p{color:#3d5a80;font-weight:600}
+.wx .d .i{font-size:20px;line-height:1.2}
+.wx .d .t b{font-weight:700}
+.wx .d .t span{color:#73777d}
+.wx .note{font-size:13px;color:#73777d}
+.wx .tabs{display:flex;gap:4px}
+.wx .tabs button{background:none;border:1px solid #ececea;border-radius:99px;padding:2px 10px;font:inherit;font-size:13px;cursor:pointer;color:#73777d}
+.wx .tabs button[aria-pressed="true"]{border-color:#1d1f22;color:#1d1f22}
 </style>
 </head>
 <body>
@@ -136,6 +151,7 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
   <div class="times"><span>ישראל <b id="cIL">--:--</b></span><span>יפן <b id="cJP">--:--</b></span><span id="cd"></span></div>
 </header>
 <div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">זיהוי מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
+<div class="wx" id="wx"><div class="wh"><b>מזג אוויר</b><div class="tabs" id="wxTabs"></div></div><div class="row" id="wxRow"><div class="note">טוען תחזית…</div></div><div class="note" id="wxNote"></div></div>
 <div style="height:12px"></div>
 <div id="here" hidden role="status" aria-live="polite"><div class="hh" id="hereT"></div><div class="hb" id="hereB"></div><div class="ha" id="hereA"></div></div>
 <div class="acc" id="acc"></div>
@@ -507,6 +523,48 @@ try{if(localStorage.getItem("jp26:loc")==="1")startLoc()}catch(e){}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-term]");if(!b)return;e.preventDefault();e.stopPropagation();const t=TERMS[b.dataset.term];
  tipH.textContent=t[0];tipEn.textContent=t[1];tipJp.textContent=t[2];tipD.textContent=t[3];tip.hidden=false},true);
 tipX.onclick=()=>tip.hidden=true;
+</script>
+
+<script>
+/* Weather: Open-Meteo (free, no key). Live forecast covers 16 days; before that, December averages. Last result kept for offline. */
+const WXP=[
+ {id:"hadano",name:"הבית והכנס",en:"Hadano",lat:35.381,lng:139.278},
+ {id:"tokyo",name:"טוקיו",en:"Tokyo",lat:35.690,lng:139.700}
+];
+const TRIP_FROM="2026-12-10",TRIP_TO="2026-12-24";
+const WMO=c=>c===0?["☀","בהיר"]:c<=2?["⛅","מעונן חלקית"]:c===3?["☁","מעונן"]:c<=48?["🌫","ערפל"]:c<=57?["🌦","טפטוף"]:c<=67?["☂","גשם"]:c<=77?["❄","שלג"]:c<=82?["☂","ממטרים"]:c<=86?["❄","שלג"]:["⛈","סופה"];
+const HEDAY=["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
+let wxPlace=(()=>{try{return localStorage.getItem("jp26:wxp")||"hadano"}catch(e){return "hadano"}})();
+const wxTabs=document.getElementById("wxTabs"),wxRow=document.getElementById("wxRow"),wxNote=document.getElementById("wxNote");
+function wxDrawTabs(){wxTabs.innerHTML=WXP.map(p=>`<button data-p="${p.id}" aria-pressed="${p.id===wxPlace}">${p.name} <span style="direction:ltr;unicode-bidi:isolate">${p.en}</span></button>`).join("")}
+wxTabs.onclick=e=>{const b=e.target.closest("[data-p]");if(!b)return;wxPlace=b.dataset.p;try{localStorage.setItem("jp26:wxp",wxPlace)}catch(e){}wxDrawTabs();wxLoad()};
+function wxDraw(d,stale){
+ const days=d.daily.time.map((t,i)=>({t,mx:Math.round(d.daily.temperature_2m_max[i]),mn:Math.round(d.daily.temperature_2m_min[i]),p:d.daily.precipitation_probability_max?.[i],c:d.daily.weather_code[i]}));
+ const todayJP=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Tokyo"});
+ const inTrip=todayJP>=TRIP_FROM&&todayJP<=TRIP_TO;
+ const show=days.filter(x=>inTrip?x.t>=todayJP:(x.t>=TRIP_FROM&&x.t<=TRIP_TO));
+ const lastDay=days[days.length-1].t;
+ if(!show.length){
+  wxRow.innerHTML=`<div class="d"><div class="i">❄</div><div class="t"><b>11°</b> <span>3°</span></div><div>ממוצע דצמבר</div></div>`;
+  const avail=new Date(new Date(TRIP_FROM)-15*864e5).toLocaleDateString("he-IL",{day:"numeric",month:"numeric"});
+  wxNote.textContent=`התחזית לימי הנסיעה תופיע כאן מ־${avail} בערך. בינתיים: בדצמבר בדרך כלל יבש ושמשי, 9–12° ביום ו־1–5° בלילה. בבקרים קר.`;
+  return}
+ wxRow.innerHTML=show.map(x=>{const [i,l]=WMO(x.c);const dt=new Date(x.t+"T12:00:00+09:00");const trip=x.t>=TRIP_FROM&&x.t<=TRIP_TO;
+  return `<div class="d ${trip?"trip":""} ${x.p>=50?"rain":""}" title="${l}"><div>${HEDAY[dt.getUTCDay()]} ${dt.getUTCDate()}.${dt.getUTCMonth()+1}</div><div class="i" aria-label="${l}">${i}</div><div class="t"><b>${x.mx}°</b> <span>${x.mn}°</span></div>${x.p!=null?`<div class="p">${x.p}%☂</div>`:""}</div>`}).join("");
+ const rainy=show.filter(x=>x.p>=50).map(x=>new Date(x.t+"T12:00:00+09:00").getUTCDate()+".12");
+ const cold=Math.min(...show.map(x=>x.mn));
+ wxNote.textContent=(stale?"תחזית שמורה (אין חיבור). ":"")+
+  (show[show.length-1].t<TRIP_TO&&lastDay<TRIP_TO&&!inTrip?"התחזית מגיעה עד "+lastDay.slice(8)+"."+lastDay.slice(5,7)+". ":"")+
+  (rainy.length?"מטריה ב־"+rainy.join(", ")+". ":"")+(cold<=3?"לילות קרים, עד "+cold+"°. ":"");
+}
+async function wxLoad(){
+ const p=WXP.find(x=>x.id===wxPlace)||WXP[0];
+ const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16`;
+ try{const r=await fetch(url);if(!r.ok)throw 0;const d=await r.json();try{localStorage.setItem("jp26:wx:"+p.id,JSON.stringify(d))}catch(e){}wxDraw(d,false)}
+ catch(e){let d=null;try{d=JSON.parse(localStorage.getItem("jp26:wx:"+p.id))}catch(_){}
+  if(d)wxDraw(d,true);else{wxRow.innerHTML="";wxNote.textContent="אין חיבור לאינטרנט כרגע, אז אין תחזית."}}
+}
+wxDrawTabs();wxLoad();setInterval(wxLoad,3*3600e3);
 </script>
 </body>
 </html>
