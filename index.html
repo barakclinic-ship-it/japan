@@ -101,6 +101,21 @@ dl.gloss dd{margin:2px 0 0;color:#73777d}
 .wxp .d span{color:#73777d}
 .wxp .note{font-size:12px;color:#73777d}
 h1{padding-inline-end:120px}
+
+/* header composition */
+header{padding-block:14px 16px!important}
+.topbar{position:relative;display:flex;align-items:center;gap:12px;min-height:30px;margin-bottom:14px}
+.topbar .tools{margin:0!important;display:flex;gap:14px}
+.wxc{position:static!important;margin-inline-start:auto}
+.wxp{top:38px!important;inset-inline-end:0}
+h1{padding-inline-end:0!important;line-height:1.2}
+.meta{margin-top:4px}
+.infobar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-top:14px;padding-top:12px;border-top:1px solid #ececea}
+.infobar .times{margin:0!important;gap:4px 14px}
+.infobar .locbar{margin:0!important;font-size:13px}
+.infobar .locbar button{padding:2px 10px;font-size:13px}
+.srch{margin-bottom:14px}
+.srch input{padding-inline-end:96px}
 </style>
 </head>
 <body>
@@ -186,18 +201,20 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 </style>
 
 <div class="wrap">
-<header style="position:relative">
-  <button id="wxChip" class="wxc" hidden aria-expanded="false"></button>
-  <div id="wxPop" class="wxp" hidden></div>
+<header>
+  <div class="topbar">
+    <div class="tools"><button id="shareBtn">שיתוף</button><button id="installBtn" hidden>התקנה בטלפון</button></div>
+    <button id="wxChip" class="wxc" hidden aria-expanded="false"></button>
+    <div id="wxPop" class="wxp" hidden></div>
+  </div>
   <h1><span class="logo" aria-hidden="true"></span>יפן · דצמבר 2026</h1>
   <div class="meta">ברק ועמית · כנס נפילות בטוחות, אוניברסיטת טוקאי</div>
-  <div class="tools"><button id="shareBtn">שיתוף</button><button id="installBtn" hidden>התקנה בטלפון</button></div>
-  <div class="times"><span>ישראל <b id="cIL">--:--</b></span><span>יפן <b id="cJP">--:--</b></span><span id="cd"></span></div>
+  <div class="infobar">
+    <div class="times"><span>ישראל <b id="cIL">--:--</b></span><span>יפן <b id="cJP">--:--</b></span><span id="cd"></span></div>
+    <div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
+  </div>
 </header>
-<div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">זיהוי מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
-
-<div style="height:12px"></div>
-<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש: תחנה, כרטיס, מילה ביפנית…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="cam" id="camBtn" type="button">צילום שלט</button><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button><input type="file" id="camIn" accept="image/*" capture="environment" hidden></div>
+<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="cam" id="camBtn" type="button">צילום שלט</button><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button><input type="file" id="camIn" accept="image/*" capture="environment" hidden></div>
 <div id="ocrBox" hidden></div>
 <div id="sres" hidden></div>
 <div id="here" hidden role="status" aria-live="polite"><div class="hh" id="hereT"></div><div class="hb" id="hereB"></div><div class="ha" id="hereA"></div></div>
@@ -575,7 +592,7 @@ function startLoc(){
  try{if("Notification"in window&&Notification.permission==="default")Notification.requestPermission()}catch(e){}
 }
 function stopLoc(){if(watchId!==null)navigator.geolocation.clearWatch(watchId);watchId=null;lastAnchor=null;
- locBar.classList.remove("on");locBtn.classList.remove("on");locBtn.textContent="להפעיל";locTxt.textContent="זיהוי מיקום כבוי";
+ locBar.classList.remove("on");locBtn.classList.remove("on");locBtn.textContent="להפעיל";locTxt.textContent="מיקום כבוי";
  try{localStorage.setItem("jp26:loc","0")}catch(e){}}
 locBtn.onclick=()=>watchId===null?startLoc():stopLoc();
 document.getElementById("hereA").addEventListener("click",e=>{
