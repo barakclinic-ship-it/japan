@@ -77,6 +77,19 @@ dl.gloss dd{margin:2px 0 0;color:#73777d}
 .flash{animation:flash 1.8s ease-out}
 @keyframes flash{0%,40%{background:#fdeeb5}100%{background:transparent}}
 @media (prefers-reduced-motion:reduce){.flash{animation:none;background:#fdeeb5}}
+
+.srch .cam{position:absolute;inset-inline-end:36px;top:50%;transform:translateY(-50%);background:none;border:0;color:#3d5a80;font:inherit;font-size:14px;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:3px}
+.srch input{padding-inline-end:110px}
+#ocrBox{display:grid;gap:8px;margin-bottom:12px;padding:12px;border:1px solid #ececea;border-radius:10px}
+#ocrBox img{max-height:140px;width:auto;border-radius:6px;justify-self:start}
+#ocrBox .st{font-size:14px;color:#73777d}
+#ocrBox .raw{font-family:"Noto Sans JP",sans-serif;font-size:14px;color:#73777d;direction:ltr;text-align:right;overflow-wrap:anywhere}
+#ocrBox .hits{display:flex;flex-wrap:wrap;gap:8px}
+#ocrBox .hits button{background:#f2f5f9;border:1px solid #c9d3e1;border-radius:8px;padding:6px 10px;font:inherit;font-size:15px;cursor:pointer;text-align:start}
+#ocrBox .hits .jp{font-weight:700}
+#ocrBox .hits .en{font-size:13px;color:#3d5a80;direction:ltr;unicode-bidi:isolate}
+#ocrBox .x{justify-self:start;background:none;border:0;color:#73777d;text-decoration:underline;font:inherit;font-size:13px;cursor:pointer;padding:0}
+.bar2{height:4px;background:#ececea;border-radius:4px;overflow:hidden}.bar2 i{display:block;height:100%;width:0;background:#3d5a80;transition:width .2s}
 </style>
 </head>
 <body>
@@ -171,7 +184,8 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
 <div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">זיהוי מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
 <div class="wx" id="wx"><div class="wh"><b>מזג אוויר</b><div class="tabs" id="wxTabs"></div></div><div class="row" id="wxRow"><div class="note">טוען תחזית…</div></div><div class="note" id="wxNote"></div></div>
 <div style="height:12px"></div>
-<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש: תחנה, כרטיס, מילה ביפנית…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button></div>
+<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש: תחנה, כרטיס, מילה ביפנית…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="cam" id="camBtn" type="button">צילום שלט</button><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button><input type="file" id="camIn" accept="image/*" capture="environment" hidden></div>
+<div id="ocrBox" hidden></div>
 <div id="sres" hidden></div>
 <div id="here" hidden role="status" aria-live="polite"><div class="hh" id="hereT"></div><div class="hb" id="hereB"></div><div class="ha" id="hereA"></div></div>
 <div class="acc" id="acc"></div>
@@ -240,6 +254,25 @@ const TERMS={
  suica:["סוּאיקָה","Suica","Suica","כרטיס נסיעה נטען, כמו רב־קו. טוענים כסף ומעבירים בשער של כל רכבת (JR, אודקיו), אוטובוס, ואפילו בקופה של סבן־אילבן. באייפון אפשר להוסיף אותו ל־Apple Wallet. אחרת קונים כרטיס פיזי Welcome Suica לתיירים במכונה בשדה."],
  locker:["לוקרים","Coin Locker","コインロッカー","ארונות נעולים למזוודות בתחנות רכבת. משלמים במטבעות או ב־Suica."],
  seven:["סבן־אילבן","7-Eleven","セブンイレブン","רשת מכולות. הכספומטים שלה מקבלים כרטיסי אשראי זרים."],
+ s_deguchi:["יציאה","Deguchi · Exit","出口","שלט יציאה מהתחנה. לרוב צהוב. ליד היציאות כתוב גם מספר או כיוון, למשל 北口 (יציאה צפונית)."],
+ s_iriguchi:["כניסה","Iriguchi · Entrance","入口","כניסה."],
+ s_kaisatsu:["שער כרטיסים","Kaisatsu · Ticket gate","改札","השער שבו מעבירים כרטיס או Suica כדי להיכנס לרציפים או לצאת מהם."],
+ s_norikae:["מעבר בין קווים","Norikae · Transfer","乗換","שלט לכיוון קו אחר באותה תחנה. ליד המילה כתוב שם הקו, למשל 小田急線 (Odakyū-sen)."],
+ s_noriba:["רציף / מקום עלייה","Noriba · Platform","のりば","המקום שממנו עולים לרכבת, לאוטובוס או למונית."],
+ s_bansen:["רציף מספר","Bansen · Track no.","番線","מספר הרציף. למשל 3番線 זה רציף 3."],
+ s_homen:["לכיוון","Hōmen · Direction","方面","כתוב אחרי שם של תחנה: 小田原方面 זה לכיוון אודווארה, הכיוון שלנו."],
+ s_kippu:["קופת כרטיסים","Kippu-uriba · Tickets","きっぷうりば","מכונות או קופה לקניית כרטיסים. כותבים את זה גם 切符売り場."],
+ s_futsu:["רכבת רגילה","Futsū · Local","普通","רכבת שעוצרת בכל התחנות. כמו 各駅停車 (Kakueki-teisha)."],
+ s_tokkyu:["אקספרס מוגבל","Tokkyū · Limited Express","特急","רכבת מהירה שבדרך כלל דורשת כרטיס תוספת. ברומנסקאר זה הסוג."],
+ s_kaisoku:["אקספרס מהיר","Kaisoku-kyūkō · Rapid Express","快速急行","רכבת אודקיו מהירה. עוצרת בהון־אצוגי, אבל לא תמיד בצורומקי אונסן. לבדוק בלוח."],
+ s_junkyu:["אקספרס חלקי","Junkyū · Semi Express","準急","רכבת שעוצרת ביותר תחנות מאקספרס רגיל."],
+ s_eki:["תחנה","Eki · Station","駅","תחנת רכבת. מופיע בסוף שם התחנה, למשל 新宿駅."],
+ s_toilet:["שירותים","Toire · Otearai · Toilet","トイレ","שירותים. כתוב גם お手洗い."],
+ s_kin:["אסור","Kinshi · Prohibited","禁止","מופיע על שלטי איסור, למשל 禁煙 (אסור לעשן)."],
+ s_higashi:["יציאה מזרחית","Higashi-guchi · East Exit","東口","יציאה מזרחית."],
+ s_nishi:["יציאה מערבית","Nishi-guchi · West Exit","西口","יציאה מערבית. בשינג׳וקו קו אודקיו בצד המערבי."],
+ s_minami:["יציאה דרומית","Minami-guchi · South Exit","南口","יציאה דרומית."],
+ s_josha:["כרטיס עם מושב","Shiteiseki · Reserved seat","指定席","מושב שמור. בנריטה אקספרס וברומנסקאר כל המושבים כאלה."],
  vjw:["Visit Japan Web","Visit Japan Web","","אתר רשמי של ממשלת יפן (vjw-lp.digital.go.jp). ממלאים בו מראש, בבית, את טופס ההגירה ואת הצהרת המכס, ומקבלים שני ריבועי QR. בשדה סורקים אותם בביקורת הגבולות ובמכס במקום למלא טפסים בכתב יד. בלי אינטרנט בשדה, צריך צילום מסך שלהם."]
 };
 const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
@@ -631,6 +664,43 @@ sres.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)r
  (target||stEl).scrollIntoView({behavior:"smooth",block:"center"});
  if(target){target.classList.remove("flash");void target.offsetWidth;target.classList.add("flash")}
 });
+</script>
+
+<script>
+/* Photo of a sign -> Japanese text recognition on the phone (Tesseract, loaded on first use) -> known words in the app */
+const camBtn=document.getElementById("camBtn"),camIn=document.getElementById("camIn"),ocrBox=document.getElementById("ocrBox");
+camBtn.onclick=()=>camIn.click();
+let tessLoad=null;
+function loadTess(){if(window.Tesseract)return Promise.resolve();if(!tessLoad)tessLoad=new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});return tessLoad}
+function shrink(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const m=1600,k=Math.min(1,m/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=img.width*k;c.height=img.height*k;const g=c.getContext("2d");g.drawImage(img,0,0,c.width,c.height);res(c)};img.src=URL.createObjectURL(file)})}
+function vocab(){const v=[];for(const [k,t] of Object.entries(TERMS)){if(t[2])v.push({w:t[2].replace(/\s/g,""),k})}
+ for(const [jp,ro] of Object.entries(JR)){if(!v.some(x=>x.w===jp)){const k=Object.keys(TERMS).find(k=>TERMS[k][2]===jp);v.push({w:jp,k,ro})}}
+ v.push({w:"切符売り場",k:"s_kippu"},{w:"お手洗い",k:"s_toilet"},{w:"東海大学",k:"tokai"},{w:"湘南",k:"shonan"},{w:"各停",k:"kakueki"},{w:"空港",k:"narita"},{w:"小田急",k:"odakyu"},{w:"禁煙",k:"s_kin"});
+ return v.sort((a,b)=>b.w.length-a.w.length)}
+function findHits(text){const t=text.replace(/\s/g,"");const out=[],seen=new Set();
+ for(const v of vocab()){let ok=t.includes(v.w);
+  if(!ok&&v.w.length>=4){for(let i=0;i+v.w.length<=t.length&&!ok;i++){let d=0;for(let j=0;j<v.w.length;j++)if(t[i+j]!==v.w[j]&&++d>1)break;if(d<=1)ok=true}}
+  if(ok){const key=v.k||v.w;if(!seen.has(key)){seen.add(key);out.push(v)}}}
+ return out}
+camIn.onchange=async()=>{const f=camIn.files[0];camIn.value="";if(!f)return;
+ const url=URL.createObjectURL(f);
+ ocrBox.hidden=false;ocrBox.innerHTML=`<img src="${url}" alt="התמונה שצולמה"><div class="st" id="ocrSt">טוען זיהוי טקסט יפני… בפעם הראשונה זה לוקח קצת זמן</div><div class="bar2"><i id="ocrBar"></i></div>`;
+ try{await loadTess();
+  const canvas=await shrink(f);
+  const r=await Tesseract.recognize(canvas,"jpn",{logger:m=>{const st=document.getElementById("ocrSt"),b=document.getElementById("ocrBar");if(!st)return;
+   if(m.status==="recognizing text"){st.textContent="מזהה טקסט…";b.style.width=Math.round(m.progress*100)+"%"}else if(/load/.test(m.status)){st.textContent="מוריד את מילון היפנית (פעם אחת בלבד)…";b.style.width=Math.round((m.progress||0)*100)+"%"}}});
+  const text=(r.data.text||"").trim();const hits=findHits(text);
+  ocrBox.innerHTML=`<img src="${url}" alt="התמונה שצולמה">`+
+   (hits.length?`<div class="st">נמצא בתמונה:</div><div class="hits">${hits.map(h=>{const t=h.k?TERMS[h.k]:null;
+     return `<button ${t?`data-term="${h.k}"`:`data-q="${h.w}"`}><span class="jp">${h.w}</span> <span class="en">${t?t[1].split(" · ")[0]:(h.ro||"")}</span>${t?` · ${t[0]}`:""}</button>`}).join("")}</div>`
+    :`<div class="st">לא זיהיתי בתמונה מילה שמופיעה באפליקציה. כדאי לצלם קרוב יותר, ישר מול השלט. לתרגום של כל השלט: מצב מצלמה ב־Google Translate.</div>`)+
+   (text?`<div class="raw">זוהה: ${text.replace(/[<>&]/g,"").slice(0,160)}</div>`:"")+
+   `<button class="x" id="ocrX">סגור</button>`;
+  document.getElementById("ocrX").onclick=()=>{ocrBox.hidden=true;ocrBox.innerHTML=""};
+  if(hits.length){const t=hits[0].k?TERMS[hits[0].k]:null;q.value=t?t[0]:hits[0].w;search()}
+ }catch(e){ocrBox.innerHTML=`<div class="st">זיהוי הטקסט לא עבד. צריך אינטרנט בפעם הראשונה כדי להוריד את מילון היפנית.</div><button class="x" onclick="ocrBox.hidden=true">סגור</button>`}
+};
+ocrBox.addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b){q.value=b.dataset.q;search()}});
 </script>
 </body>
 </html>
