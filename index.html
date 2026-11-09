@@ -609,7 +609,7 @@ function search(){
  if(!raw){sres.hidden=true;accEl.hidden=false;return}
  if(!IDX)buildIdx();
  const words=norm(raw).split(" ").filter(Boolean);
- const hits=IDX.filter(x=>words.every(w=>x.n.includes(w)));
+ const hits=IDX.filter(x=>{const c=x.c||(x.c=x.n.replace(/ /g,""));return words.every(w=>x.n.includes(w)||c.includes(w))});
  const groups=[["card","כרטיסים להראות"],["term","מקומות ומונחים"],["step","בשלבים"]];
  let html="";
  for(const [k,lab] of groups){const g=hits.filter(h=>h.k===k).slice(0,k==="step"?12:8);if(!g.length)continue;
