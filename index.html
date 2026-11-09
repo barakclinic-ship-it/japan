@@ -334,7 +334,7 @@ const TERMS={
 };
 const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
 const JR={"新松田":"Shin-Matsuda","松田":"Matsuda","御殿場":"Gotemba","河口湖":"Kawaguchiko","河口湖駅":"Kawaguchiko-eki","三島":"Mishima","三島駅":"Mishima-eki","新幹線":"Shinkansen","京都":"Kyōto","広島":"Hiroshima","宮島口":"Miyajima-guchi","宮島":"Miyajima","東京":"Tōkyō","品川":"Shinagawa","指定席":"Shiteiseki","下吉田":"Shimoyoshida","水道橋":"Suidōbashi","九段下":"Kudanshita","京都タワー":"Kyōto Tawā","小田原":"Odawara","鶴巻温泉":"Tsurumaki-Onsen","東海大学前":"Tōkai-Daigakumae","各駅停車":"Kakueki-teisha","片瀬江ノ島":"Katase-Enoshima","小田急線":"Odakyū-sen","急行":"Kyūkō","快速急行":"Kaisoku-kyūkō","成田空港":"Narita Kūkō","本厚木":"Hon-Atsugi","新宿":"Shinjuku","第1ターミナル":"Dai-ichi Tāminaru","北口":"Kita-guchi","コインロッカー":"Koin rokkā","ロマンスカー":"Romansukā"};
-const J=s=>`<span class="jp">${s}</span>${JR[s]?` <span class="rj">${JR[s]}</span>`:""}`;
+const J=(s,ro=1)=>`<span class="jp">${s}</span>${ro&&JR[s]?` <span class="rj">${JR[s]}</span>`:""}`;
 
 const STEPS=[
  {id:"prep",t:"לפני היציאה",d:"עד 8.12",html:()=>`
@@ -452,8 +452,8 @@ const STEPS=[
   <h3>שני 14.12 · יציאה מהבית ונסיעה לפוג׳י</h3>
   ${chk("fuji1",[
    "לארוז הכול, כולל ג'ודוגי וכביסה, ולהחזיר את המפתח לתיבה עד 11:00",
-   ["אודקיו מ"+T("tsuru")+" לכיוון "+J("小田原")+", 4 תחנות, עד "+T("shinmatsuda")+" "+J("新松田")+".","<span class='dur'>כ־15 דק׳</span>"],
-   ["הולכים 2 דקות לתחנת JR מצודה "+J("松田")+" ועולים על קו גוטמבה עד "+T("gotemba")+" "+J("御殿場")+".","<span class='dur'>כ־40 דק׳ · רכבת כל שעה בערך</span>"],
+   ["אודקיו מ"+T("tsuru")+" לכיוון "+J("小田原")+", 4 תחנות, עד "+T("shinmatsuda")+" "+J("新松田",0)+".","<span class='dur'>כ־15 דק׳</span>"],
+   ["הולכים 2 דקות לתחנת JR מצודה "+J("松田")+" ועולים על קו גוטמבה עד "+T("gotemba")+" "+J("御殿場",0)+".","<span class='dur'>כ־40 דק׳ · רכבת כל שעה בערך</span>"],
    ["מתחנת גוטמבה, "+T("bus","אוטובוס")+" ל"+T("kawaguchiko")+" "+J("河口湖駅")+".",sh("busfuji","איפה האוטובוס?")+" <span class='dur'>כשעה</span>"],
    "צ׳ק־אין בקוואגוצ׳יקו, ערב על שפת האגם"])}
   <h3>שלישי 15.12 · יום של פוג׳י</h3>
@@ -469,7 +469,7 @@ const STEPS=[
   ${chk("kyo1",[
    ["אוטובוס מתחנת קוואגוצ׳יקו לתחנת "+T("mishima")+" "+J("三島駅")+".",sh("busmishima","איפה האוטובוס?")+" <span class='dur'>כ־2 שעות · לבדוק שעות מראש</span>"],
    ["במישימה קונים "+T("shinkansen")+" לקיוטו בקופה של JR.",sh("shinkyoto","להראות בקופה")],
-   ["שינקנסן Hikari או Kodama עד "+T("kyoto")+" "+J("京都")+".","<span class='dur'>כ־2 שעות</span>"],
+   ["שינקנסן Hikari או Kodama עד "+T("kyoto")+" "+J("京都",0)+".","<span class='dur'>כ־2 שעות</span>"],
    "צ׳ק־אין בקיוטו"])}
   <h3>חמישי 17.12</h3>
   ${chk("kyo2",[
@@ -485,7 +485,7 @@ const STEPS=[
   <div class="sub">המסלול: ${T("kyoto")} ← ${T("shinkansen")} ← ${T("hiroshima")}. כשעה ו־40 דק׳.</div>
   <h3>שבת 19.12</h3>
   ${chk("hir1",[
-   ["שינקנסן Nozomi מקיוטו ל"+T("hiroshima")+" "+J("広島")+".",sh("shinhiro","להראות בקופה")+" <span class='dur'>כ־1:40</span>"],
+   ["שינקנסן Nozomi מקיוטו ל"+T("hiroshima")+" "+J("広島",0)+".",sh("shinhiro","להראות בקופה")+" <span class='dur'>כ־1:40</span>"],
    "להשאיר מזוודות בלינה או בלוקר בתחנה",
    [T("peace")+" ופארק השלום","<span class='dur'>חשמלית מהתחנה, כ־15 דק׳</span>"],
    "ערב: אוקונומיאקי בסגנון הירושימה"])}
@@ -493,7 +493,7 @@ const STEPS=[
   ${chk("hir2",[
    ["JR לתחנת "+J("宮島口")+" ומשם "+T("ferry","מעבורת")+" ל"+T("miyajima")+".",sh("ferrymiya","איפה המעבורת?")+" <span class='dur'>כשעה בסך הכול</span>"],
    "השער הצף והאיילים, חוזרים עד הצהריים",
-   ["שינקנסן Nozomi מהירושימה ל"+T("tokyo")+" "+J("東京")+".",sh("shintokyo","להראות בקופה")+" <span class='dur'>כ־4 שעות</span>"]])}
+   ["שינקנסן Nozomi מהירושימה ל"+T("tokyo")+" "+J("東京",0)+".",sh("shintokyo","להראות בקופה")+" <span class='dur'>כ־4 שעות</span>"]])}
   <div class="warn">המראה של השער הצף תלוי בגאות. בשפל אפשר ללכת עד אליו ברגל. כדאי לבדוק את טבלת הגאות של מיאג׳ימה.</div>`},
  {id:"tokyo",t:"טוקיו",d:"ראשון–חמישי 20–24.12 · 4 לילות",html:()=>`
   <div class="sub">שלושה ימים מלאים בטוקיו, והטיסה ביום חמישי ב־15:45.</div>
