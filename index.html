@@ -251,6 +251,12 @@ const CARDS={
  airport:{he:"הרכבת הזאת נוסעת לנמל התעופה נריטה?",ja:"この電車は\n成田空港に行きますか？",ro:"Kono densha wa Narita Kūkō ni ikimasu ka?"},
  english:{he:"אתם מדברים אנגלית?",ja:"英語を話せますか？",ro:"Eigo o hanasemasu ka?"},
  write:{he:"אפשר לכתוב את זה?",ja:"ここに書いて\nいただけますか？",ro:"Koko ni kaite itadakemasu ka?"},
+ busfuji:{he:"איפה האוטובוס לתחנת קוואגוצ׳יקו?",ja:"河口湖駅行きのバスは\nどこですか？",ro:"Kawaguchiko-eki yuki no basu wa doko desu ka?"},
+ busmishima:{he:"איפה האוטובוס לתחנת מישימה?",ja:"三島駅行きのバスは\nどこですか？",ro:"Mishima-eki yuki no basu wa doko desu ka?"},
+ shinkyoto:{he:"2 כרטיסי שינקנסן לקיוטו, מושב שמור",ja:"新幹線で京都まで\n大人2枚、指定席で\nお願いします",ro:"Shinkansen de Kyōto made, otona ni-mai, shiteiseki de onegaishimasu"},
+ shinhiro:{he:"2 כרטיסי שינקנסן להירושימה, מושב שמור",ja:"新幹線で広島まで\n大人2枚、指定席で\nお願いします",ro:"Shinkansen de Hiroshima made, otona ni-mai, shiteiseki de onegaishimasu"},
+ shintokyo:{he:"2 כרטיסי שינקנסן לטוקיו, מושב שמור",ja:"新幹線で東京まで\n大人2枚、指定席で\nお願いします",ro:"Shinkansen de Tōkyō made, otona ni-mai, shiteiseki de onegaishimasu"},
+ ferrymiya:{he:"איפה המעבורת למיאג׳ימה?",ja:"宮島行きのフェリーは\nどこですか？",ro:"Miyajima yuki no ferī wa doko desu ka?"},
  help:{he:"חירום: בבקשה תזמינו אמבולנס",ja:"救急車を\n呼んでください",addr:"119",ro:"Kyūkyūsha o yonde kudasai"}
 };
 const sh=(id,label)=>`<button class="show" data-card="${id}">${label||"להראות"}</button>`;
@@ -303,10 +309,31 @@ const TERMS={
  s_nishi:["יציאה מערבית","Nishi-guchi · West Exit","西口","יציאה מערבית. בשינג׳וקו קו אודקיו בצד המערבי."],
  s_minami:["יציאה דרומית","Minami-guchi · South Exit","南口","יציאה דרומית."],
  s_josha:["כרטיס עם מושב","Shiteiseki · Reserved seat","指定席","מושב שמור. בנריטה אקספרס וברומנסקאר כל המושבים כאלה."],
+ fuji:["הר פוג׳י","Mount Fuji · Fujisan","富士山","ההר הגבוה ביפן, 3,776 מ׳. בדצמבר מושלג ולרוב נראה הכי טוב בבוקר, בשמיים בהירים."],
+ kawaguchiko:["קוואגוצ׳יקו","Kawaguchiko","河口湖","עיירה על אגם למרגלות הר פוג׳י. הבסיס הנוח לנופים של ההר."],
+ chureito:["פגודת צ׳וריטו","Chureito Pagoda","忠霊塔","פגודה אדומה על גבעה מעל העיירה פוג׳יושידה, עם הנוף הכי מצולם של פוג׳י. כ־400 מדרגות."],
+ shinmatsuda:["שין־מצודה","Shin-Matsuda","新松田","תחנת אודקיו, 4 תחנות מערבית לצורומקי אונסן. ממנה הולכים 2 דק׳ לתחנת JR מצודה (Matsuda 松田)."],
+ gotemba:["גוטמבה","Gotemba","御殿場","עיירה למרגלות פוג׳י. מהתחנה יוצאים אוטובוסים לקוואגוצ׳יקו."],
+ mishima:["מישימה","Mishima","三島","עיר עם תחנת שינקנסן. ממנה מגיעים בשינקנסן לקיוטו."],
+ shinkansen:["שינקנסן","Shinkansen","新幹線","רכבת הקליע. רציפים נפרדים בתחנה, כרטיס נפרד, עדיף מושב שמור 指定席 (Shiteiseki). Nozomi הכי מהירה, Hikari ו־Kodama עוצרות ביותר תחנות."],
+ kyoto:["קיוטו","Kyoto","京都","הבירה העתיקה של יפן. מקדשים, גנים ורחובות עץ."],
+ inari:["פושימי אינרי","Fushimi Inari","伏見稲荷","מקדש עם אלפי שערים אדומים לאורך שביל בהר. פתוח תמיד, הכי שקט מוקדם בבוקר."],
+ butokuden:["בוטוקודן","Butokuden","武徳殿","אולם אמנויות לחימה היסטורי בקיוטו (1899), ליד מקדש הייאן. היה המרכז של Dai Nippon Butoku Kai."],
+ snm:["מוזיאון הסמוראי והנינג׳ה","Samurai Ninja Museum","サムライ忍者ミュージアム","מוזיאון בקיוטו עם שריון, חרבות וסדנת נינג׳ה קצרה. כדאי להזמין מראש."],
+ hiroshima:["הירושימה","Hiroshima","広島","עיר במערב יפן. מוזיאון השלום ופארק הזיכרון לפצצת האטום."],
+ peace:["מוזיאון השלום","Peace Memorial Museum","平和記念資料館","מוזיאון הזיכרון לפצצת האטום, בתוך פארק השלום. כשעתיים, קשה רגשית."],
+ miyajima:["מיאג׳ימה","Miyajima","宮島","אי ליד הירושימה עם השער הצף בים, איטסוקושימה (Itsukushima 厳島神社). מגיעים ברכבת ובמעבורת."],
+ tokyo:["טוקיו","Tokyo","東京","הבירה. תחנת טוקיו היא תחנת השינקנסן הראשית, ויש ממנה נריטה אקספרס לשדה."],
+ kodokan:["קודוקן","Kodokan","講道館","המטה העולמי של הג׳ודו, מאז 1882. יש מוזיאון, ואפשר לצפות באימונים מהיציע."],
+ nbudokan:["ניפון בודוקאן","Nippon Budokan","日本武道館","אולם אמנויות הלחימה הלאומי בטוקיו, ליד הארמון הקיסרי."],
+ unko:["מוזיאון הקקי","Unko Museum","うんこミュージアム","מוזיאון משחקי ומצחיק, בקניון DiverCity באודאיבה (Odaiba お台場)."],
+ asakusa:["אסקוסה","Asakusa","浅草","שכונה עם מקדש סנסו־ג׳י (Sensō-ji 浅草寺), העתיק בטוקיו."],
+ ferry:["מעבורת","Ferry","フェリー","המעבורת של JR לאי מיאג׳ימה, 10 דק׳."],
+ bus:["אוטובוס","Bus","バス","האוטובוסים הבין־עירוניים יוצאים מרציף ממוספר מול התחנה. משלמים ב־Suica או במזומן."],
  vjw:["Visit Japan Web","Visit Japan Web","","אתר רשמי של ממשלת יפן (vjw-lp.digital.go.jp). ממלאים בו מראש, בבית, את טופס ההגירה ואת הצהרת המכס, ומקבלים שני ריבועי QR. בשדה סורקים אותם בביקורת הגבולות ובמכס במקום למלא טפסים בכתב יד. בלי אינטרנט בשדה, צריך צילום מסך שלהם."]
 };
 const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
-const JR={"小田原":"Odawara","鶴巻温泉":"Tsurumaki-Onsen","東海大学前":"Tōkai-Daigakumae","各駅停車":"Kakueki-teisha","片瀬江ノ島":"Katase-Enoshima","小田急線":"Odakyū-sen","急行":"Kyūkō","快速急行":"Kaisoku-kyūkō","成田空港":"Narita Kūkō","本厚木":"Hon-Atsugi","新宿":"Shinjuku","第1ターミナル":"Dai-ichi Tāminaru","北口":"Kita-guchi","コインロッカー":"Koin rokkā","ロマンスカー":"Romansukā"};
+const JR={"新松田":"Shin-Matsuda","松田":"Matsuda","御殿場":"Gotemba","河口湖":"Kawaguchiko","河口湖駅":"Kawaguchiko-eki","三島":"Mishima","三島駅":"Mishima-eki","新幹線":"Shinkansen","京都":"Kyōto","広島":"Hiroshima","宮島口":"Miyajima-guchi","宮島":"Miyajima","東京":"Tōkyō","品川":"Shinagawa","指定席":"Shiteiseki","下吉田":"Shimoyoshida","水道橋":"Suidōbashi","九段下":"Kudanshita","京都タワー":"Kyōto Tawā","小田原":"Odawara","鶴巻温泉":"Tsurumaki-Onsen","東海大学前":"Tōkai-Daigakumae","各駅停車":"Kakueki-teisha","片瀬江ノ島":"Katase-Enoshima","小田急線":"Odakyū-sen","急行":"Kyūkō","快速急行":"Kaisoku-kyūkō","成田空港":"Narita Kūkō","本厚木":"Hon-Atsugi","新宿":"Shinjuku","第1ターミナル":"Dai-ichi Tāminaru","北口":"Kita-guchi","コインロッカー":"Koin rokkā","ロマンスカー":"Romansukā"};
 const J=s=>`<span class="jp">${s}</span>${JR[s]?` <span class="rj">${JR[s]}</span>`:""}`;
 
 const STEPS=[
@@ -314,7 +341,11 @@ const STEPS=[
   ${chk("prep",[
    ["להזמין את הבית ב־Airbnb, 10–14.12 (4 לילות)","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"],
    "לשאול את המארחת הירומי איך מחממים את הבית",
-   "לסגור לינה מ־14.12 ואילך",
+   "לינה בקוואגוצ׳יקו 14–16.12 (2 לילות)",
+   "לינה בקיוטו 16–19.12 (3 לילות)",
+   "לינה בהירושימה 19–20.12 (לילה אחד)",
+   "לינה בטוקיו 20–24.12 (4 לילות), קרוב לתחנת טוקיו או שינג׳וקו",
+   "להזמין מראש: Samurai Ninja Museum בקיוטו, Unko Museum בטוקיו",
    "דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק",
    "ביטוח נסיעות ל־9–24.12",
    ["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) ולשמור צילום מסך של קודי ה־QR",""],
@@ -416,17 +447,77 @@ const STEPS=[
    ["שיתוף בדוג'ו ב"+T("budokan")+", טורניר קנדו נוער",""],
    "הרצאות וטקס פרסים",
    "חוזרים לישון בבית"])}`},
- {id:"checkout",t:"יציאה מהבית",d:"שני 14.12 · עד 11:00",html:()=>`
-  ${chk("checkout",["לארוז הכול, כולל ג'ודוגי וכביסה","להחזיר את המפתח לתיבה","לצאת עד 11:00"])}
-  <div class="sub">אם צריך להשאיר מזוודות: ${T("locker")} בתחנה. ${sh("locker","לשאול איפה")}</div>
-  <h3>לאן ממשיכים</h3>
-  <textarea data-note="next" placeholder="היעד הבא ואיך מגיעים"></textarea>`},
- {id:"open",t:"הימים הפתוחים",d:"14–23.12",html:()=>`
-  <textarea data-note="open" style="min-height:120px" placeholder="14.12 —&#10;15.12 —&#10;16.12 —"></textarea>
-  ${chk("open",[["לינה ללילה האחרון קרוב ל"+T("narita")+" או ל"+T("shinjuku"),""]])}`},
+ {id:"fuji",t:"הר פוג׳י",d:"שני–רביעי 14–16.12 · 2 לילות בקוואגוצ׳יקו",html:()=>`
+  <div class="sub">הצעה, לפי המקומות שסימנת במפות. המסלול: ${T("tsuru")} ← אודקיו ← ${T("shinmatsuda")} ← JR ← ${T("gotemba")} ← ${T("bus")} ← ${T("kawaguchiko")}. כ־2.5–3 שעות.</div>
+  <h3>שני 14.12 · יציאה מהבית ונסיעה לפוג׳י</h3>
+  ${chk("fuji1",[
+   "לארוז הכול, כולל ג'ודוגי וכביסה, ולהחזיר את המפתח לתיבה עד 11:00",
+   ["אודקיו מ"+T("tsuru")+" לכיוון "+J("小田原")+", 4 תחנות, עד "+T("shinmatsuda")+" "+J("新松田")+".","<span class='dur'>כ־15 דק׳</span>"],
+   ["הולכים 2 דקות לתחנת JR מצודה "+J("松田")+" ועולים על קו גוטמבה עד "+T("gotemba")+" "+J("御殿場")+".","<span class='dur'>כ־40 דק׳ · רכבת כל שעה בערך</span>"],
+   ["מתחנת גוטמבה, "+T("bus","אוטובוס")+" ל"+T("kawaguchiko")+" "+J("河口湖駅")+".",sh("busfuji","איפה האוטובוס?")+" <span class='dur'>כשעה</span>"],
+   "צ׳ק־אין בקוואגוצ׳יקו, ערב על שפת האגם"])}
+  <h3>שלישי 15.12 · יום של פוג׳י</h3>
+  ${chk("fuji2",[
+   ["בבוקר מוקדם, כשהשמיים הכי בהירים: "+T("chureito")+". רכבת Fujikyu תחנה אחת־שתיים עד "+J("下吉田")+", ומשם מדרגות.",""],
+   "הליכה לאורך אגם קוואגוצ׳יקו, הצד הצפוני עם הנוף להר",
+   "רכבל Kachi Kachi לתצפית על ההר והאגם",
+   "בערב: אונסן עם נוף לפוג׳י"])}
+  <div class="warn">פוג׳י מתחבא בעננים הרבה פעמים. אם בבוקר של 15.12 ההר לא נראה, לנסות שוב בבוקר של 16.12 לפני הנסיעה.</div>`},
+ {id:"kyoto",t:"קיוטו",d:"רביעי–שבת 16–19.12 · 3 לילות",html:()=>`
+  <div class="sub">המסלול: ${T("kawaguchiko")} ← ${T("bus","אוטובוס")} ← ${T("mishima")} ← ${T("shinkansen")} ← ${T("kyoto")}. כ־4.5 שעות.</div>
+  <h3>רביעי 16.12 · נסיעה לקיוטו</h3>
+  ${chk("kyo1",[
+   ["אוטובוס מתחנת קוואגוצ׳יקו לתחנת "+T("mishima")+" "+J("三島駅")+".",sh("busmishima","איפה האוטובוס?")+" <span class='dur'>כ־2 שעות · לבדוק שעות מראש</span>"],
+   ["במישימה קונים "+T("shinkansen")+" לקיוטו בקופה של JR.",sh("shinkyoto","להראות בקופה")],
+   ["שינקנסן Hikari או Kodama עד "+T("kyoto")+" "+J("京都")+".","<span class='dur'>כ־2 שעות</span>"],
+   "צ׳ק־אין בקיוטו"])}
+  <h3>חמישי 17.12</h3>
+  ${chk("kyo2",[
+   [T("inari")+" מוקדם בבוקר, לפני ההמונים","<span class='dur'>JR Nara Line, 2 תחנות מתחנת קיוטו</span>"],
+   [T("snm")+" (להזמין מראש)",""],
+   "ערב בגיון (Gion 祇園), הרובע הישן"])}
+  <h3>שישי 18.12</h3>
+  ${chk("kyo3",[
+   [T("butokuden")+", אולם אמנויות הלחימה ההיסטורי, ליד מקדש הייאן",""],
+   "ארשיאמה (Arashiyama 嵐山): יער הבמבוק והנהר",
+   "קינקקו־ג׳י (Kinkaku-ji 金閣寺), מקדש הזהב"])}`},
+ {id:"hiroshima",t:"הירושימה ומיאג׳ימה",d:"שבת–ראשון 19–20.12 · לילה אחד",html:()=>`
+  <div class="sub">המסלול: ${T("kyoto")} ← ${T("shinkansen")} ← ${T("hiroshima")}. כשעה ו־40 דק׳.</div>
+  <h3>שבת 19.12</h3>
+  ${chk("hir1",[
+   ["שינקנסן Nozomi מקיוטו ל"+T("hiroshima")+" "+J("広島")+".",sh("shinhiro","להראות בקופה")+" <span class='dur'>כ־1:40</span>"],
+   "להשאיר מזוודות בלינה או בלוקר בתחנה",
+   [T("peace")+" ופארק השלום","<span class='dur'>חשמלית מהתחנה, כ־15 דק׳</span>"],
+   "ערב: אוקונומיאקי בסגנון הירושימה"])}
+  <h3>ראשון 20.12 · מיאג׳ימה ונסיעה לטוקיו</h3>
+  ${chk("hir2",[
+   ["JR לתחנת "+J("宮島口")+" ומשם "+T("ferry","מעבורת")+" ל"+T("miyajima")+".",sh("ferrymiya","איפה המעבורת?")+" <span class='dur'>כשעה בסך הכול</span>"],
+   "השער הצף והאיילים, חוזרים עד הצהריים",
+   ["שינקנסן Nozomi מהירושימה ל"+T("tokyo")+" "+J("東京")+".",sh("shintokyo","להראות בקופה")+" <span class='dur'>כ־4 שעות</span>"]])}
+  <div class="warn">המראה של השער הצף תלוי בגאות. בשפל אפשר ללכת עד אליו ברגל. כדאי לבדוק את טבלת הגאות של מיאג׳ימה.</div>`},
+ {id:"tokyo",t:"טוקיו",d:"ראשון–חמישי 20–24.12 · 4 לילות",html:()=>`
+  <div class="sub">שלושה ימים מלאים בטוקיו, והטיסה ביום חמישי ב־15:45.</div>
+  <h3>שני 21.12</h3>
+  ${chk("tok1",[
+   [T("kodokan")+", מטה הג׳ודו העולמי: מוזיאון וצפייה באימון","<span class='dur'>תחנת "+J("水道橋")+"</span>"],
+   [T("nbudokan")+" והגנים של הארמון הקיסרי","<span class='dur'>תחנת "+J("九段下")+"</span>"]])}
+  <h3>שלישי 22.12</h3>
+  ${chk("tok2",[
+   [T("asakusa")+" ומקדש סנסו־ג׳י בבוקר",""],
+   [T("unko")+" באודאיבה (להזמין מראש)",""]])}
+  <h3>רביעי 23.12</h3>
+  ${chk("tok3",[
+   "יום חופשי: שיבויה, שינג׳וקו, קניות",
+   "לארוז ולבדוק משקל מזוודות (2 מזוודות בחזור)"])}
+  <h3>מקומות שסימנת במפות</h3>
+  <ul class="plain">
+   <li>Tokai Univ. Martial Arts Hall: הבודוקאן של הכנס</li>
+   <li>Mount Fuji · SAMURAI NINJA MUSEUM Kyoto · Hiroshima Peace Memorial Museum · UNKO MUSEUM TOKYO</li>
+  </ul>
+  <textarea data-note="open" style="min-height:90px" placeholder="הערות ושינויים לתוכנית"></textarea>`},
  {id:"ret",t:"טיסה הביתה",d:"חמישי 24.12 · 15:45 מנריטה",html:()=>`
   <div><div class="big">15:45</div><div class="sub">טיסה LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50</div></div>
-  <div class="sub">המסלול: ${T("shinjuku")} (או תחנת טוקיו, Tokyo) ← רכבת ${T("nex")} ← ${T("narita")} ${T("t1")}</div>
+  <div class="sub">המסלול: ${T("tokyo","תחנת טוקיו")} או ${T("shinjuku")} ← רכבת ${T("nex")} ← ${T("narita")} ${T("t1")}. מתחנת טוקיו כשעה.</div>
   <div class="key">שוב קונים את כרטיס הנריטה אקספרס במקום, בקופה של JR בתחנה שיוצאים ממנה. להיות בשדה עד 12:45.</div>
   ${chk("ret",[
    ["מגיעים לקופה של "+T("jr")+" (שלט ירוק).",sh("jrdesk","לא מוצאים? להראות")],
@@ -542,7 +633,13 @@ const ANCHORS=[
  {id:"shinjuku",lat:35.6896,lng:139.7006,r:700,name:"שינג׳וקו"},
  {id:"tsuru",lat:35.3811,lng:139.2779,r:650,name:"צורומקי אונסן"},
  {id:"tokai",lat:35.3731,lng:139.2712,r:300,name:"תחנת טוקאי־דאיגקומאה"},
- {id:"campus",lat:35.3635,lng:139.2745,r:700,name:"קמפוס טוקאי"}
+ {id:"campus",lat:35.3635,lng:139.2745,r:700,name:"קמפוס טוקאי"},
+ {id:"gotemba",lat:35.2964,lng:138.9452,r:500,name:"תחנת גוטמבה"},
+ {id:"kawaguchiko",lat:35.4985,lng:138.7688,r:1200,name:"קוואגוצ׳יקו"},
+ {id:"mishima",lat:35.1265,lng:138.9108,r:600,name:"תחנת מישימה"},
+ {id:"kyoto",lat:34.9858,lng:135.7588,r:700,name:"תחנת קיוטו"},
+ {id:"hiroshima",lat:34.3979,lng:132.4753,r:700,name:"תחנת הירושימה"},
+ {id:"tokyost",lat:35.6812,lng:139.7671,r:600,name:"תחנת טוקיו"}
 ];
 const isDone=id=>{const s=STEPS.find(x=>x.id===id);return s?stat(s).done:true};
 function adviceFor(a){
@@ -560,6 +657,12 @@ function adviceFor(a){
    ?{step:"toHome",b:"הגעתם. 7 דקות הליכה לבית, צ׳ק־אין עצמי עם תיבת מנעול.",cards:[]}
    :{step:nextStepId(),b:"לקמפוס: רכבת לכיוון 小田原 (Odawara), תחנה אחת, עד 東海大学前 (Tōkai-Daigakumae).",cards:[["campus","להראות לנהג"]]};
   case "tokai":return {step:nextStepId(),b:"הליכה של 15–20 דקות לקמפוס, או מונית.",cards:[["campus","להראות לנהג"],["bldg","איפה בניין 15"]]};
+ case "gotemba":return {step:"fuji",b:"מחפשים את רציף האוטובוס לקוואגוצ׳יקו 河口湖駅 (Kawaguchiko-eki) מול התחנה.",cards:[["busfuji","איפה האוטובוס"]]};
+  case "kawaguchiko":return {step:isDone("fuji")?"kyoto":"fuji",b:isDone("fuji")?"אוטובוס לתחנת מישימה 三島駅 (Mishima-eki), כשעתיים.":"הגעתם לקוואגוצ׳יקו. בבוקר הבהיר: פגודת צ׳וריטו.",cards:isDone("fuji")?[["busmishima","איפה האוטובוס"]]:[]};
+  case "mishima":return {step:"kyoto",b:"קונים בקופה של JR שינקנסן לקיוטו 京都 (Kyōto), מושב שמור.",cards:[["shinkyoto","כרטיס בקופה"]]};
+  case "kyoto":return isDone("kyoto")?{step:"hiroshima",b:"שינקנסן Nozomi להירושימה 広島 (Hiroshima).",cards:[["shinhiro","כרטיס בקופה"]]}:{step:"kyoto",b:"הגעתם לקיוטו.",cards:[]};
+  case "hiroshima":return isDone("hiroshima")?{step:"tokyo",b:"שינקנסן Nozomi לטוקיו 東京 (Tōkyō), כ־4 שעות.",cards:[["shintokyo","כרטיס בקופה"]]}:{step:"hiroshima",b:"למוזיאון השלום: חשמלית מהתחנה. למיאג׳ימה: JR ל־宮島口 (Miyajima-guchi) ומעבורת.",cards:[["ferrymiya","איפה המעבורת"]]};
+  case "tokyost":{const d=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Tokyo"});return d>="2026-12-24"?{step:"ret",b:"נריטה אקספרס לטרמינל 1. קונים בקופה של JR.",cards:[["jrdesk","איפה הקופה"],["nexback","כרטיס בקופה"]]}:{step:"tokyo",b:"תחנת טוקיו.",cards:[]}}
   case "campus":return {step:nextStepId(),b:"הרצאות: בניין 15, חדר 611. מעשי: הדוג'ו באולם הבודוקאן.",cards:[["bldg","לשאול איפה"]]};
  }}
 function nextStepId(){const i=nextIdx();return i>=0?STEPS[i].id:null}
