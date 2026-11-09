@@ -672,15 +672,23 @@ const camBtn=document.getElementById("camBtn"),camIn=document.getElementById("ca
 camBtn.onclick=()=>camIn.click();
 let tessLoad=null;
 function loadTess(){if(window.Tesseract)return Promise.resolve();if(!tessLoad)tessLoad=new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)});return tessLoad}
-function shrink(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const m=1600,k=Math.min(1,m/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=img.width*k;c.height=img.height*k;const g=c.getContext("2d");g.drawImage(img,0,0,c.width,c.height);res(c)};img.src=URL.createObjectURL(file)})}
+function shrink(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const m=1600,k=Math.min(1,m/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=img.width*k;c.height=img.height*k;const g=c.getContext("2d");g.drawImage(img,0,0,c.width,c.height);
+  /* grayscale, and flip white-on-dark signs to dark-on-white, which reads better */
+  const d=g.getImageData(0,0,c.width,c.height),a=d.data;let sum=0;for(let i=0;i<a.length;i+=4){const y=.299*a[i]+.587*a[i+1]+.114*a[i+2];a[i]=a[i+1]=a[i+2]=y;sum+=y}
+  if(sum/(a.length/4)<110)for(let i=0;i<a.length;i+=4){a[i]=a[i+1]=a[i+2]=255-a[i]}
+  g.putImageData(d,0,0);res(c)};img.src=URL.createObjectURL(file)})}
 function vocab(){const v=[];for(const [k,t] of Object.entries(TERMS)){if(t[2])v.push({w:t[2].replace(/\s/g,""),k})}
  for(const [jp,ro] of Object.entries(JR)){if(!v.some(x=>x.w===jp)){const k=Object.keys(TERMS).find(k=>TERMS[k][2]===jp);v.push({w:jp,k,ro})}}
  v.push({w:"切符売り場",k:"s_kippu"},{w:"お手洗い",k:"s_toilet"},{w:"東海大学",k:"tokai"},{w:"湘南",k:"shonan"},{w:"各停",k:"kakueki"},{w:"空港",k:"narita"},{w:"小田急",k:"odakyu"},{w:"禁煙",k:"s_kin"});
  return v.sort((a,b)=>b.w.length-a.w.length)}
-function findHits(text){const t=text.replace(/\s/g,"");const out=[],seen=new Set();
- for(const v of vocab()){let ok=t.includes(v.w);
-  if(!ok&&v.w.length>=4){for(let i=0;i+v.w.length<=t.length&&!ok;i++){let d=0;for(let j=0;j<v.w.length;j++)if(t[i+j]!==v.w[j]&&++d>1)break;if(d<=1)ok=true}}
-  if(ok){const key=v.k||v.w;if(!seen.has(key)){seen.add(key);out.push(v)}}}
+function findHits(text){const t=text.replace(/\s/g,"");const out=[],seen=new Set(),cov=new Array(t.length).fill(false);const V=vocab();
+ const add=v=>{const key=v.k||v.w;if(!seen.has(key)){seen.add(key);out.push(v)}};
+ /* exact matches first, then near-misses only where nothing exact was read */
+ for(const v of V){let i=t.indexOf(v.w);if(i<0)continue;add(v);while(i>=0){for(let j=0;j<v.w.length;j++)cov[i+j]=true;i=t.indexOf(v.w,i+1)}}
+ for(const v of V){if(v.w.length<4||seen.has(v.k||v.w))continue;
+  for(let i=0;i+v.w.length<=t.length;i++){let d=0,run=0,best=0,c=0;
+   for(let j=0;j<v.w.length;j++){if(cov[i+j])c++;if(t[i+j]!==v.w[j]){d++;run=0}else{run++;best=Math.max(best,run)}}
+   if(c<=1&&(d<=1||(d<=2&&best>=2))){add(v);break}}}
  return out}
 camIn.onchange=async()=>{const f=camIn.files[0];camIn.value="";if(!f)return;
  const url=URL.createObjectURL(f);
