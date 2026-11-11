@@ -330,7 +330,7 @@ const TERMS={
  asakusa:["אסקוסה","Asakusa","浅草","שכונה עם מקדש סנסו־ג׳י (Sensō-ji 浅草寺), העתיק בטוקיו."],
  ferry:["מעבורת","Ferry","フェリー","המעבורת של JR לאי מיאג׳ימה, 10 דק׳."],
  bus:["אוטובוס","Bus","バス","האוטובוסים הבין־עירוניים יוצאים מרציף ממוספר מול התחנה. משלמים ב־Suica או במזומן."],
- vjw:["Visit Japan Web","Visit Japan Web","","אתר רשמי של ממשלת יפן (vjw-lp.digital.go.jp). ממלאים בו מראש, בבית, את טופס ההגירה ואת הצהרת המכס, ומקבלים שני ריבועי QR. בשדה סורקים אותם בביקורת הגבולות ובמכס במקום למלא טפסים בכתב יד. בלי אינטרנט בשדה, צריך צילום מסך שלהם."]
+ vjw:["Visit Japan Web","Visit Japan Web","","טופס ההגירה והמכס של יפן בגרסה דיגיטלית. לא ויזה: ישראלים לא צריכים ויזה עד 90 יום. לא חובה, אבל חוסך תור וטפסים בכתב יד. ממלאים באתר הרשמי vjw-lp.digital.go.jp, בחינם, ומקבלים קוד QR שסורקים בעמדה בנריטה יחד עם הדרכון. אתרים אחרים שמבקשים תשלום, או מציעים להסדיר JESTA, הם הונאה. JESTA עוד לא פועל (היעד 2028)."]
 };
 const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
 const JR={"新松田":"Shin-Matsuda","松田":"Matsuda","御殿場":"Gotemba","河口湖":"Kawaguchiko","河口湖駅":"Kawaguchiko-eki","三島":"Mishima","三島駅":"Mishima-eki","新幹線":"Shinkansen","京都":"Kyōto","広島":"Hiroshima","宮島口":"Miyajima-guchi","宮島":"Miyajima","東京":"Tōkyō","品川":"Shinagawa","指定席":"Shiteiseki","下吉田":"Shimoyoshida","水道橋":"Suidōbashi","九段下":"Kudanshita","京都タワー":"Kyōto Tawā","小田原":"Odawara","鶴巻温泉":"Tsurumaki-Onsen","東海大学前":"Tōkai-Daigakumae","各駅停車":"Kakueki-teisha","片瀬江ノ島":"Katase-Enoshima","小田急線":"Odakyū-sen","急行":"Kyūkō","快速急行":"Kaisoku-kyūkō","成田空港":"Narita Kūkō","本厚木":"Hon-Atsugi","新宿":"Shinjuku","第1ターミナル":"Dai-ichi Tāminaru","北口":"Kita-guchi","コインロッカー":"Koin rokkā","ロマンスカー":"Romansukā"};
@@ -348,10 +348,10 @@ const STEPS=[
    "להזמין מראש: Samurai Ninja Museum בקיוטו, Unko Museum בטוקיו",
    "דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק",
    "ביטוח נסיעות ל־9–24.12",
-   ["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) ולשמור צילום מסך של קודי ה־QR",""],
+   ["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) באתר הרשמי <a href='https://vjw-lp.digital.go.jp/en/' target='_blank' rel='noopener'>vjw-lp.digital.go.jp</a>, בחינם. לרשום גם את עמית באותו חשבון","<span class='dur'>צריך: דרכון, טיסה LY 091 ב־10.12 לנריטה, כתובת הבית מ־Airbnb. עד שבוע לפני. לצלם מסך של קודי ה־QR</span>"],
    "חבילת גלישה ליפן ב־eSIM (למשל esimo), להתקין בבית ולהפעיל בנחיתה",
    ["כרטיס נסיעה "+T("suica","Suica")+": באייפון דרך Apple Wallet, או קונים כרטיס Welcome Suica בשדה",""],
-   "קצת ין (מטבע יפני) במזומן",
+   ["להשיג ין (מטבע יפני) במזומן בארץ, ממוריה או מצ׳יינג׳ אחר","<span class='dur'>להתקשר מראש לבדוק שיש ין במלאי. ביפן עדיין משלמים הרבה במזומן, בעיקר במקומות קטנים ובמקדשים</span>"],
    "מתאם חשמל לשקע אמריקאי שטוח (Type A)",
    "ג'ודוגי לבן",
    "המצגות ב־PowerPoint על דיסק און קי",
