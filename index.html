@@ -122,6 +122,10 @@ h1{padding-inline-end:0!important;line-height:1.2}
 .tpb{background:#fff;border:1px solid #c9d3e1;border-radius:99px;padding:4px 10px;font:inherit;font-size:13px;color:#3d5a80;cursor:pointer}
 .tpb:hover{background:#f2f5f9}
 #toast2{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;background:#1d1f22;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:min(92vw,420px);text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+.srch .cams{position:absolute;inset-inline-end:36px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:2px}
+.srch .cams .cam{position:static;transform:none;padding:4px 4px}
+.srch .cams .sep{color:#c9c9c4}
 </style>
 </head>
 <body>
@@ -220,7 +224,7 @@ footer{margin-top:32px;font-size:13px;color:var(--muted);display:grid;gap:6px}
     <div class="locbar" id="locbar"><span class="locdot"></span><span id="locTxt">מיקום כבוי</span><button id="locBtn">להפעיל</button></div>
   </div>
 </header>
-<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><button class="cam" id="camBtn" type="button">צילום שלט</button><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button><input type="file" id="camIn" accept="image/*" capture="environment" hidden></div>
+<div class="srch"><span class="ic" aria-hidden="true">⌕</span><input id="q" type="search" placeholder="חיפוש…" autocomplete="off" enterkeyhint="search" aria-label="חיפוש"><span class="cams"><button class="cam" id="camBtn" type="button">צילום</button><span class="sep">·</span><button class="cam" id="galBtn" type="button">גלריה</button></span><button class="clr" id="qClr" hidden aria-label="ניקוי">×</button><input type="file" id="camIn" accept="image/*" capture="environment" hidden><input type="file" id="galIn" accept="image/*" hidden></div>
 <div id="ocrBox" hidden></div>
 <div id="sres" hidden></div>
 <div id="here" hidden role="status" aria-live="polite"><div class="hh" id="hereT"></div><div class="hb" id="hereB"></div><div class="ha" id="hereA"></div></div>
@@ -829,7 +833,7 @@ function findHits(text){const t=text.replace(/\s/g,"");const out=[],seen=new Set
    for(let j=0;j<v.w.length;j++){if(cov[i+j])c++;if(t[i+j]!==v.w[j]){d++;run=0}else{run++;best=Math.max(best,run)}}
    if(c<=1&&(d<=1||(d<=2&&best>=2))){add(v);break}}}
  return out}
-camIn.onchange=async()=>{const f=camIn.files[0];camIn.value="";if(!f)return;
+async function readSign(f){if(!f)return;
  const url=URL.createObjectURL(f);
  ocrBox.hidden=false;ocrBox.innerHTML=`<img src="${url}" alt="התמונה שצולמה"><div class="st" id="ocrSt">טוען זיהוי טקסט יפני… בפעם הראשונה זה לוקח קצת זמן</div><div class="bar2"><i id="ocrBar"></i></div>`;
  try{await loadTess();
@@ -846,7 +850,10 @@ camIn.onchange=async()=>{const f=camIn.files[0];camIn.value="";if(!f)return;
   document.getElementById("ocrX").onclick=()=>{ocrBox.hidden=true;ocrBox.innerHTML=""};
   if(hits.length){const t=hits[0].k?TERMS[hits[0].k]:null;q.value=t?t[0]:hits[0].w;search()}
  }catch(e){ocrBox.innerHTML=`<div class="st">זיהוי הטקסט לא עבד. צריך אינטרנט בפעם הראשונה כדי להוריד את מילון היפנית.</div><button class="x" onclick="ocrBox.hidden=true">סגור</button>`}
-};
+}
+camIn.onchange=()=>{const f=camIn.files[0];camIn.value="";readSign(f)};
+const galIn=document.getElementById("galIn");document.getElementById("galBtn").onclick=()=>galIn.click();
+galIn.onchange=()=>{const f=galIn.files[0];galIn.value="";readSign(f)};
 ocrBox.addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b){q.value=b.dataset.q;search()}});
 </script>
 
