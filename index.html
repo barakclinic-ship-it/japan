@@ -116,6 +116,12 @@ h1{padding-inline-end:0!important;line-height:1.2}
 .infobar .locbar button{padding:2px 10px;font-size:13px}
 .srch{margin-bottom:14px}
 .srch input{padding-inline-end:96px}
+
+.tp{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tp .tpl{font-size:12px;color:#73777d;letter-spacing:.02em}
+.tpb{background:#fff;border:1px solid #c9d3e1;border-radius:99px;padding:4px 10px;font:inherit;font-size:13px;color:#3d5a80;cursor:pointer}
+.tpb:hover{background:#f2f5f9}
+#toast2{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;background:#1d1f22;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:min(92vw,420px);text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -334,6 +340,7 @@ const TERMS={
 };
 const T=(k,show)=>{const t=TERMS[k];return `<button class="term" data-term="${k}">${show||t[0]} <span class="en">${t[1].split(" · ")[0]}</span></button>`};
 const JR={"新松田":"Shin-Matsuda","松田":"Matsuda","御殿場":"Gotemba","河口湖":"Kawaguchiko","河口湖駅":"Kawaguchiko-eki","三島":"Mishima","三島駅":"Mishima-eki","新幹線":"Shinkansen","京都":"Kyōto","広島":"Hiroshima","宮島口":"Miyajima-guchi","宮島":"Miyajima","東京":"Tōkyō","品川":"Shinagawa","指定席":"Shiteiseki","下吉田":"Shimoyoshida","水道橋":"Suidōbashi","九段下":"Kudanshita","京都タワー":"Kyōto Tawā","小田原":"Odawara","鶴巻温泉":"Tsurumaki-Onsen","東海大学前":"Tōkai-Daigakumae","各駅停車":"Kakueki-teisha","片瀬江ノ島":"Katase-Enoshima","小田急線":"Odakyū-sen","急行":"Kyūkō","快速急行":"Kaisoku-kyūkō","成田空港":"Narita Kūkō","本厚木":"Hon-Atsugi","新宿":"Shinjuku","第1ターミナル":"Dai-ichi Tāminaru","北口":"Kita-guchi","コインロッカー":"Koin rokkā","ロマンスカー":"Romansukā"};
+const TP=legs=>`<div class="tp"><span class="tpl">🚆 Transit Planner</span>${legs.map(([a,b])=>`<button class="tpb" data-tp-from="${a}" data-tp-to="${b}"><span dir="ltr">${a} → ${b}</span></button>`).join("")}</div>`;
 const J=(s,ro=1)=>`<span class="jp">${s}</span>${ro&&JR[s]?` <span class="rj">${JR[s]}</span>`:""}`;
 
 const STEPS=[
@@ -351,7 +358,7 @@ const STEPS=[
    ["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) באתר הרשמי <a href='https://vjw-lp.digital.go.jp/en/' target='_blank' rel='noopener'>vjw-lp.digital.go.jp</a>, בחינם. לרשום גם את עמית באותו חשבון","<span class='dur'>צריך: דרכון, טיסה LY 091 ב־10.12 לנריטה, כתובת הבית מ־Airbnb. עד שבוע לפני. לצלם מסך של קודי ה־QR</span>"],
    "חבילת גלישה ליפן ב־eSIM (למשל esimo), להתקין בבית ולהפעיל בנחיתה",
    ["כרטיס נסיעה "+T("suica","Suica")+": באייפון דרך Apple Wallet, או קונים כרטיס Welcome Suica בשדה",""],
-   ["להשיג ין (מטבע יפני) במזומן בארץ, ממוריה או מצ׳יינג׳ אחר","<span class='dur'>להתקשר מראש לבדוק שיש ין במלאי. ביפן עדיין משלמים הרבה במזומן, בעיקר במקומות קטנים ובמקדשים</span>"],
+   ["לאסוף ין מחברים שנשאר להם מטיולים ביפן","<span class='dur'>מה שחסר: כספומט של סבן־אילבן ביפן. ביפן עדיין משלמים הרבה במזומן, בעיקר במקומות קטנים, במקדשים ובאוטובוסים</span>"],
    "מתאם חשמל לשקע אמריקאי שטוח (Type A)",
    "ג'ודוגי לבן",
    "המצגות ב־PowerPoint על דיסק און קי",
@@ -388,6 +395,7 @@ const STEPS=[
    ["למשוך ין בכספומט של "+T("seven"),""]])}`},
  {id:"toHome",t:"מנריטה לבית",d:"חמישי 10.12 · יציאה ~15:00 · בבית ~18:30",html:()=>`
   <div class="sub">המסלול: ${T("narita")} ← רכבת ${T("nex")} ← ${T("shinjuku")} ← רכבת ${T("odakyu")} ← ${T("tsuru")} ← הבית</div>
+  ${TP([["Narita Airport Terminal 1","Shinjuku"],["Shinjuku","Tsurumaki-Onsen"]])}
   <h3>לוח זמנים משוער (שעון יפן)</h3>
   <dl class="facts tl">
    <dt>13:30</dt><dd>נחיתה</dd>
@@ -422,6 +430,7 @@ const STEPS=[
   <div class="warn">אין גלאי עשן בבית, לפי המודעה.</div>`},
  {id:"day1",t:"כנס · יום שישי",d:"11.12 · 09:30–17:30 · מסיבת פתיחה 18:30",html:()=>`
   <div class="sub">המסלול: הבית ← ${T("tsuru")} ← תחנה אחת ← ${T("tokaist")} ← הליכה ל${T("shonan")}</div>
+  ${TP([["Tsurumaki-Onsen","Tokaidaigakumae"]])}
   ${chk("day1",[
    ["7 דקות הליכה מהבית לתחנת "+T("tsuru")+".",""],
    ["רכבת לכיוון "+J("小田原")+" ("+T("odawara")+"), תחנה אחת בלבד, עד "+T("tokaist")+" "+J("東海大学前")+".","<span class='dur'>כ־3 דק׳</span>"],
@@ -449,6 +458,7 @@ const STEPS=[
    "חוזרים לישון בבית"])}`},
  {id:"fuji",t:"הר פוג׳י",d:"שני–רביעי 14–16.12 · 2 לילות בקוואגוצ׳יקו",html:()=>`
   <div class="sub">הצעה, לפי המקומות שסימנת במפות. המסלול: ${T("tsuru")} ← אודקיו ← ${T("shinmatsuda")} ← JR ← ${T("gotemba")} ← ${T("bus")} ← ${T("kawaguchiko")}. כ־2.5–3 שעות.</div>
+  ${TP([["Tsurumaki-Onsen","Gotemba"],["Gotemba","Kawaguchiko"]])}
   <h3>שני 14.12 · יציאה מהבית ונסיעה לפוג׳י</h3>
   ${chk("fuji1",[
    "לארוז הכול, כולל ג'ודוגי וכביסה, ולהחזיר את המפתח לתיבה עד 11:00",
@@ -465,6 +475,7 @@ const STEPS=[
   <div class="warn">פוג׳י מתחבא בעננים הרבה פעמים. אם בבוקר של 15.12 ההר לא נראה, לנסות שוב בבוקר של 16.12 לפני הנסיעה.</div>`},
  {id:"kyoto",t:"קיוטו",d:"רביעי–שבת 16–19.12 · 3 לילות",html:()=>`
   <div class="sub">המסלול: ${T("kawaguchiko")} ← ${T("bus","אוטובוס")} ← ${T("mishima")} ← ${T("shinkansen")} ← ${T("kyoto")}. כ־4.5 שעות.</div>
+  ${TP([["Kawaguchiko","Mishima"],["Mishima","Kyoto"]])}
   <h3>רביעי 16.12 · נסיעה לקיוטו</h3>
   ${chk("kyo1",[
    ["אוטובוס מתחנת קוואגוצ׳יקו לתחנת "+T("mishima")+" "+J("三島駅")+".",sh("busmishima","איפה האוטובוס?")+" <span class='dur'>כ־2 שעות · לבדוק שעות מראש</span>"],
@@ -483,6 +494,7 @@ const STEPS=[
    "קינקקו־ג׳י (Kinkaku-ji 金閣寺), מקדש הזהב"])}`},
  {id:"hiroshima",t:"הירושימה ומיאג׳ימה",d:"שבת–ראשון 19–20.12 · לילה אחד",html:()=>`
   <div class="sub">המסלול: ${T("kyoto")} ← ${T("shinkansen")} ← ${T("hiroshima")}. כשעה ו־40 דק׳.</div>
+  ${TP([["Kyoto","Hiroshima"],["Hiroshima","Miyajimaguchi"],["Hiroshima","Tokyo"]])}
   <h3>שבת 19.12</h3>
   ${chk("hir1",[
    ["שינקנסן Nozomi מקיוטו ל"+T("hiroshima")+" "+J("広島",0)+".",sh("shinhiro","להראות בקופה")+" <span class='dur'>כ־1:40</span>"],
@@ -497,6 +509,7 @@ const STEPS=[
   <div class="warn">המראה של השער הצף תלוי בגאות. בשפל אפשר ללכת עד אליו ברגל. כדאי לבדוק את טבלת הגאות של מיאג׳ימה.</div>`},
  {id:"tokyo",t:"טוקיו",d:"ראשון–חמישי 20–24.12 · 4 לילות",html:()=>`
   <div class="sub">שלושה ימים מלאים בטוקיו, והטיסה ביום חמישי ב־15:45.</div>
+  ${TP([["Tokyo","Suidobashi"],["Tokyo","Asakusa"]])}
   <h3>שני 21.12</h3>
   ${chk("tok1",[
    [T("kodokan")+", מטה הג׳ודו העולמי: מוזיאון וצפייה באימון","<span class='dur'>תחנת "+J("水道橋")+"</span>"],
@@ -518,6 +531,7 @@ const STEPS=[
  {id:"ret",t:"טיסה הביתה",d:"חמישי 24.12 · 15:45 מנריטה",html:()=>`
   <div><div class="big">15:45</div><div class="sub">טיסה LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50</div></div>
   <div class="sub">המסלול: ${T("tokyo","תחנת טוקיו")} או ${T("shinjuku")} ← רכבת ${T("nex")} ← ${T("narita")} ${T("t1")}. מתחנת טוקיו כשעה.</div>
+  ${TP([["Tokyo","Narita Airport Terminal 1"],["Shinjuku","Narita Airport Terminal 1"]])}
   <div class="key">שוב קונים את כרטיס הנריטה אקספרס במקום, בקופה של JR בתחנה שיוצאים ממנה. להיות בשדה עד 12:45.</div>
   ${chk("ret",[
    ["מגיעים לקופה של "+T("jr")+" (שלט ירוק).",sh("jrdesk","לא מוצאים? להראות")],
@@ -834,6 +848,23 @@ camIn.onchange=async()=>{const f=camIn.files[0];camIn.value="";if(!f)return;
  }catch(e){ocrBox.innerHTML=`<div class="st">זיהוי הטקסט לא עבד. צריך אינטרנט בפעם הראשונה כדי להוריד את מילון היפנית.</div><button class="x" onclick="ocrBox.hidden=true">סגור</button>`}
 };
 ocrBox.addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(b){q.value=b.dataset.q;search()}});
+</script>
+
+<script>
+/* Open Japan Transit Planner (Jorudan). Copies the destination so it can be pasted, then opens the app. */
+const TP_PKG="jp.co.jorudan.nrkj",TP_PLAY="https://play.google.com/store/apps/details?id="+TP_PKG,TP_IOS="https://apps.apple.com/app/id299490481";
+function toast2(m){let t=document.getElementById("toast2");if(!t){t=document.createElement("div");t.id="toast2";document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,4000)}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-tp-to]");if(!b)return;e.preventDefault();
+ const from=b.dataset.tpFrom,to=b.dataset.tpTo;
+ try{await navigator.clipboard.writeText(to)}catch(_){}
+ toast2(`הועתק: ${to}. באפליקציה: מ־${from} אל ${to} (להדביק ביעד)`);
+ const ua=navigator.userAgent;
+ setTimeout(()=>{
+  if(/Android/i.test(ua))location.href=`intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${TP_PKG};S.browser_fallback_url=${encodeURIComponent(TP_PLAY)};end`;
+  else if(/iPhone|iPad|iPod/i.test(ua))location.href=TP_IOS;
+  else window.open("https://world.jorudan.co.jp/mln/en/","_blank","noopener");
+ },700);
+});
 </script>
 </body>
 </html>
