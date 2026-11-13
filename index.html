@@ -126,6 +126,15 @@ h1{padding-inline-end:0!important;line-height:1.2}
 .srch .cams{position:absolute;inset-inline-end:36px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:2px}
 .srch .cams .cam{position:static;transform:none;padding:4px 4px}
 .srch .cams .sep{color:#c9c9c4}
+
+#ocrBox .wrap{position:relative;justify-self:start;max-width:100%;touch-action:none}
+#ocrBox canvas{display:block;max-width:100%;max-height:260px;width:auto;height:auto;border-radius:6px;cursor:crosshair}
+#ocrBox .sel{position:absolute;border:2px solid #d6262b;background:rgba(214,38,43,.08);border-radius:3px;pointer-events:none}
+#ocrBox .hint{font-size:12px;color:#73777d}
+#ocrBox .sec{font-size:12px;color:#73777d;letter-spacing:.04em;margin-top:4px}
+#ocrBox .tr{font-size:18px;line-height:1.5;white-space:pre-line;font-weight:600}
+#ocrBox .jaBox summary{font-size:13px;color:#3d5a80;cursor:pointer}
+#ocrBox .jaBox textarea{width:100%;min-height:70px;margin-top:6px;font-family:"Noto Sans JP",sans-serif;font-size:15px;background:#f6f6f4;border:1px solid #ececea;border-radius:8px;padding:8px}
 </style>
 </head>
 <body>
@@ -833,23 +842,75 @@ function findHits(text){const t=text.replace(/\s/g,"");const out=[],seen=new Set
    for(let j=0;j<v.w.length;j++){if(cov[i+j])c++;if(t[i+j]!==v.w[j]){d++;run=0}else{run++;best=Math.max(best,run)}}
    if(c<=1&&(d<=1||(d<=2&&best>=2))){add(v);break}}}
  return out}
+/* --- full flow: read text -> translate to Hebrew -> link to the trip --- */
+const CJK=/[぀-ヿ㐀-鿿ｦ-ﾟ]/;
+function cleanJa(t){return t.replace(/(?<=[　-鿿＀-￯])[ \t]+(?=[　-鿿＀-￯])/g,"").replace(/[ \t]+/g," ").trim()}
+function pickLines(data){
+ const lines=(data.lines||[]).map(l=>({t:cleanJa(l.text||""),c:l.confidence||0}));
+ /* keep lines that are mostly Japanese and read with reasonable confidence; drop the noise from trees, walls and shadows */
+ const good=lines.filter(l=>{const ja=(l.t.match(new RegExp(CJK.source,"g"))||[]).length;return l.t&&l.c>=55&&ja>=2&&ja/l.t.replace(/\s/g,"").length>=.5});
+ return (good.length?good:lines.filter(l=>l.c>=40&&CJK.test(l.t))).map(l=>l.t).join("\n")}
+async function translateJa(text){
+ if(!text.trim())return "";
+ try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=iw&dt=t&q="+encodeURIComponent(text));if(r.ok){const d=await r.json();const t=(d[0]||[]).map(x=>x[0]).join("");if(t)return t}}catch(e){}
+ try{const r=await fetch("https://api.mymemory.translated.net/get?langpair=ja|he&q="+encodeURIComponent(text.slice(0,480)));if(r.ok){const d=await r.json();const t=d.responseData&&d.responseData.translatedText;if(t)return t}}catch(e){}
+ try{if(self.Translator){const ok=await Translator.availability({sourceLanguage:"ja",targetLanguage:"he"});if(ok!=="unavailable"){const tr=await Translator.create({sourceLanguage:"ja",targetLanguage:"he"});return await tr.translate(text)}}}catch(e){}
+ return null}
+const escH=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let lastImg=null,selBox=null;
+function hitsHtml(hits){return hits.length?`<div class="sec">קשור למסע</div><div class="hits">${hits.map(h=>{const t=h.k?TERMS[h.k]:null;
+  return `<button ${t?`data-term="${h.k}"`:`data-q="${h.w}"`}><span class="jp">${h.w}</span> <span class="en">${t?t[1].split(" · ")[0]:(h.ro||"")}</span>${t?` · ${t[0]}`:""}</button>`}).join("")}</div>`:""}
+async function showResult(ja){
+ const out=document.getElementById("ocrOut");
+ if(!ja.trim()){out.innerHTML=`<div class="st">לא הצלחתי לקרוא טקסט יפני בתמונה. אפשר לסמן באצבע את השלט בתמונה ולנסות שוב, או לצלם קרוב יותר וישר מולו.</div>`;return}
+ out.innerHTML=`<div class="sec">תרגום</div><div class="tr" id="ocrTr">מתרגם…</div>${hitsHtml(findHits(ja))}
+  <details class="jaBox"><summary>הטקסט ביפנית (אפשר לתקן)</summary><textarea id="ocrJa" dir="ltr">${escH(ja)}</textarea><button class="x" id="ocrRe">לתרגם שוב</button></details>`;
+ const tr=await translateJa(ja);
+ document.getElementById("ocrTr").textContent=tr==null?"אין חיבור לאינטרנט, אז אין תרגום כרגע. המילים שקשורות למסע מופיעות למטה.":tr;
+ document.getElementById("ocrRe").onclick=()=>showResult(document.getElementById("ocrJa").value);
+ const hits=findHits(ja);if(hits.length){const t=hits[0].k?TERMS[hits[0].k]:null;q.value=t?t[0]:hits[0].w;search()}
+}
+async function ocrCanvas(canvas){
+ const st=document.getElementById("ocrSt"),bar=document.getElementById("ocrBar");st.hidden=false;bar.parentNode.hidden=false;
+ document.getElementById("ocrOut").innerHTML="";
+ await loadTess();
+ const r=await Tesseract.recognize(canvas,"jpn",{logger:m=>{if(m.status==="recognizing text"){st.textContent="קורא את הטקסט…";bar.style.width=Math.round(m.progress*100)+"%"}else if(/load/.test(m.status)){st.textContent="מוריד את מילון היפנית (פעם אחת בלבד)…";bar.style.width=Math.round((m.progress||0)*100)+"%"}}});
+ st.hidden=true;bar.parentNode.hidden=true;
+ return pickLines(r.data)}
+function cropCanvas(src,box){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(box.w));c.height=Math.max(1,Math.round(box.h));c.getContext("2d").drawImage(src,box.x,box.y,box.w,box.h,0,0,c.width,c.height);return c}
+function prep(c){/* grayscale, stretch contrast, flip white-on-dark */
+ const g=c.getContext("2d"),d=g.getImageData(0,0,c.width,c.height),a=d.data;let sum=0,mn=255,mx=0;
+ for(let i=0;i<a.length;i+=4){const y=.299*a[i]+.587*a[i+1]+.114*a[i+2];a[i]=y;sum+=y;if(y<mn)mn=y;if(y>mx)mx=y}
+ const inv=sum/(a.length/4)<110,k=255/Math.max(1,mx-mn);
+ for(let i=0;i<a.length;i+=4){let y=(a[i]-mn)*k;if(inv)y=255-y;a[i]=a[i+1]=a[i+2]=y}
+ g.putImageData(d,0,0);return c}
+function loadImg(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const m=2000,k=Math.min(1,m/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=img.width*k;c.height=img.height*k;c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c)};img.src=URL.createObjectURL(file)})}
+function setupSelect(cv){
+ const wrap=document.getElementById("ocrWrap"),rect=document.getElementById("ocrSel");let st=null;
+ const pt=e=>{const b=cv.getBoundingClientRect();return {x:(e.clientX-b.left),y:(e.clientY-b.top),bw:b.width,bh:b.height}};
+ cv.onpointerdown=e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);st=pt(e);rect.hidden=false;Object.assign(rect.style,{left:st.x+"px",top:st.y+"px",width:"0px",height:"0px"})};
+ cv.onpointermove=e=>{if(!st)return;const p=pt(e);const x=Math.min(st.x,p.x),y=Math.min(st.y,p.y),w=Math.abs(p.x-st.x),h=Math.abs(p.y-st.y);Object.assign(rect.style,{left:x+"px",top:y+"px",width:w+"px",height:h+"px"});
+  const sx=lastImg.width/p.bw,sy=lastImg.height/p.bh;selBox={x:x*sx,y:y*sy,w:w*sx,h:h*sy}};
+ cv.onpointerup=()=>{st=null;if(selBox&&selBox.w>20&&selBox.h>12){document.getElementById("ocrAgain").hidden=false}else{rect.hidden=true;selBox=null}};
+}
 async function readSign(f){if(!f)return;
- const url=URL.createObjectURL(f);
- ocrBox.hidden=false;ocrBox.innerHTML=`<img src="${url}" alt="התמונה שצולמה"><div class="st" id="ocrSt">טוען זיהוי טקסט יפני… בפעם הראשונה זה לוקח קצת זמן</div><div class="bar2"><i id="ocrBar"></i></div>`;
- try{await loadTess();
-  const canvas=await shrink(f);
-  const r=await Tesseract.recognize(canvas,"jpn",{logger:m=>{const st=document.getElementById("ocrSt"),b=document.getElementById("ocrBar");if(!st)return;
-   if(m.status==="recognizing text"){st.textContent="מזהה טקסט…";b.style.width=Math.round(m.progress*100)+"%"}else if(/load/.test(m.status)){st.textContent="מוריד את מילון היפנית (פעם אחת בלבד)…";b.style.width=Math.round((m.progress||0)*100)+"%"}}});
-  const text=(r.data.text||"").trim();const hits=findHits(text);
-  ocrBox.innerHTML=`<img src="${url}" alt="התמונה שצולמה">`+
-   (hits.length?`<div class="st">נמצא בתמונה:</div><div class="hits">${hits.map(h=>{const t=h.k?TERMS[h.k]:null;
-     return `<button ${t?`data-term="${h.k}"`:`data-q="${h.w}"`}><span class="jp">${h.w}</span> <span class="en">${t?t[1].split(" · ")[0]:(h.ro||"")}</span>${t?` · ${t[0]}`:""}</button>`}).join("")}</div>`
-    :`<div class="st">לא זיהיתי בתמונה מילה שמופיעה באפליקציה. כדאי לצלם קרוב יותר, ישר מול השלט. לתרגום של כל השלט: מצב מצלמה ב־Google Translate.</div>`)+
-   (text?`<div class="raw">זוהה: ${text.replace(/[<>&]/g,"").slice(0,160)}</div>`:"")+
-   `<button class="x" id="ocrX">סגור</button>`;
-  document.getElementById("ocrX").onclick=()=>{ocrBox.hidden=true;ocrBox.innerHTML=""};
-  if(hits.length){const t=hits[0].k?TERMS[hits[0].k]:null;q.value=t?t[0]:hits[0].w;search()}
- }catch(e){ocrBox.innerHTML=`<div class="st">זיהוי הטקסט לא עבד. צריך אינטרנט בפעם הראשונה כדי להוריד את מילון היפנית.</div><button class="x" onclick="ocrBox.hidden=true">סגור</button>`}
+ ocrBox.hidden=false;selBox=null;
+ ocrBox.innerHTML=`<div class="wrap" id="ocrWrap"><canvas id="ocrCv"></canvas><div class="sel" id="ocrSel" hidden></div></div>
+  <div class="hint">אם יש הרבה רקע, סמנו באצבע מסגרת סביב השלט.</div>
+  <button class="x" id="ocrAgain" hidden>לקרוא רק את האזור המסומן</button>
+  <div class="st" id="ocrSt">טוען זיהוי טקסט יפני…</div><div class="bar2"><i id="ocrBar"></i></div>
+  <div id="ocrOut"></div><button class="x" id="ocrX">סגור</button>`;
+ document.getElementById("ocrX").onclick=()=>{ocrBox.hidden=true;ocrBox.innerHTML=""};
+ try{
+  lastImg=await loadImg(f);
+  const cv=document.getElementById("ocrCv");cv.width=lastImg.width;cv.height=lastImg.height;cv.getContext("2d").drawImage(lastImg,0,0);
+  setupSelect(cv);
+  document.getElementById("ocrAgain").onclick=async()=>{if(!selBox)return;const c=prep(cropCanvas(lastImg,selBox));
+   let up=c;if(c.width<900){up=document.createElement("canvas");const k=900/c.width;up.width=900;up.height=c.height*k;up.getContext("2d").drawImage(c,0,0,up.width,up.height)}
+   showResult(await ocrCanvas(up))};
+  const full=prep(cropCanvas(lastImg,{x:0,y:0,w:lastImg.width,h:lastImg.height}));
+  showResult(await ocrCanvas(full));
+ }catch(e){document.getElementById("ocrOut").innerHTML=`<div class="st">זיהוי הטקסט לא עבד. בפעם הראשונה צריך אינטרנט כדי להוריד את מילון היפנית.</div>`;const s=document.getElementById("ocrSt");if(s)s.hidden=true}
 }
 camIn.onchange=()=>{const f=camIn.files[0];camIn.value="";readSign(f)};
 const galIn=document.getElementById("galIn");document.getElementById("galBtn").onclick=()=>galIn.click();
