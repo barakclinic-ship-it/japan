@@ -846,10 +846,14 @@ function findHits(text){const t=text.replace(/\s/g,"");const out=[],seen=new Set
 const CJK=/[぀-ヿ㐀-鿿ｦ-ﾟ]/;
 function cleanJa(t){return t.replace(/(?<=[　-鿿＀-￯])[ \t]+(?=[　-鿿＀-￯])/g,"").replace(/[ \t]+/g," ").trim()}
 function pickLines(data){
- const lines=(data.lines||[]).map(l=>({t:cleanJa(l.text||""),c:l.confidence||0}));
- /* keep lines that are mostly Japanese and read with reasonable confidence; drop the noise from trees, walls and shadows */
- const good=lines.filter(l=>{const ja=(l.t.match(new RegExp(CJK.source,"g"))||[]).length;return l.t&&l.c>=55&&ja>=2&&ja/l.t.replace(/\s/g,"").length>=.5});
- return (good.length?good:lines.filter(l=>l.c>=40&&CJK.test(l.t))).map(l=>l.t).join("\n")}
+ const KAN=/[一-鿿]/g;
+ const lines=(data.lines||[]).map(l=>({t:cleanJa((l.text||"").replace(/[@*<>_|~^`=#]+/g," ").replace(/(^|\s)[A-Za-z]{1,3}(?=\s|$)/g," ")),c:l.confidence||0}));
+ /* keep lines that are mostly Japanese and read with reasonable confidence; drop the noise from trees, walls and shadows.
+    weaker lines are kept only if they carry at least two kanji (sign headings are often read with low confidence) */
+ const keep=l=>{const nz=l.t.replace(/[\s.,、。・]/g,"");if(!nz)return false;const ja=(nz.match(new RegExp(CJK.source,"g"))||[]).length,kj=(nz.match(KAN)||[]).length,r=ja/nz.length;
+  return (l.c>=55&&ja>=2&&r>=.5)||(l.c>=35&&kj>=2&&r>=.7)};
+ const good=lines.filter(keep);
+ return good.map(l=>l.t.replace(/^[\s.,、・]+|[\s.,・]+$/g,"")).join("\n")}
 async function translateJa(text){
  if(!text.trim())return "";
  try{const r=await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=ja&tl=iw&dt=t&q="+encodeURIComponent(text));if(r.ok){const d=await r.json();const t=(d[0]||[]).map(x=>x[0]).join("");if(t)return t}}catch(e){}
