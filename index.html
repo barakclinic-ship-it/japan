@@ -135,6 +135,13 @@ h1{padding-inline-end:0!important;line-height:1.2}
 #ocrBox .tr{font-size:18px;line-height:1.5;white-space:pre-line;font-weight:600}
 #ocrBox .jaBox summary{font-size:13px;color:#3d5a80;cursor:pointer}
 #ocrBox .jaBox textarea{width:100%;min-height:70px;margin-top:6px;font-family:"Noto Sans JP",sans-serif;font-size:15px;background:#f6f6f4;border:1px solid #ececea;border-radius:8px;padding:8px}
+
+details.pack{border:1px solid #ececea;border-radius:10px;padding:8px 12px}
+details.pack summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none}
+details.pack summary::-webkit-details-marker{display:none}
+details.pack summary::after{content:"‹";float:inline-end;color:#73777d;transition:transform .2s}
+details.pack[open] summary::after{transform:rotate(-90deg)}
+details.pack[open] summary{margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -376,6 +383,15 @@ const STEPS=[
    "ג'ודוגי לבן",
    "המצגות ב־PowerPoint על דיסק און קי",
    "צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"])}
+  <details class="pack"><summary>ביגוד וציוד לכנס</summary>
+  ${chk("pack",[
+   ["שישי, הרצאות ומסיבה: לבוש מסודר","<span class='dur'>מכנסיים מחויטים או צ׳ינו, חולצה מכופתרת, ז׳קט או סוודר</span>"],
+   ["ג׳ודוגי לבן לשבת ולראשון","<span class='dur'>דרישה של הכנס</span>"],
+   ["חולצה מסודרת להחלפה בראשון","<span class='dur'>הרצאות וטקס אחרי הדוג׳ו</span>"],
+   ["מעיל חם, שכבות, צעיף, תרמית","<span class='dur'>3–13° בדצמבר, הדוג׳ו יכול להיות קר</span>"],
+   ["נעליים שקל לחלוץ, גרביים שלמות","<span class='dur'>חולצים נעליים בדוג׳ו ובהרבה מקומות</span>"],
+   "מגבת קטנה"])}
+  </details>
   <h3>אפליקציות להתקין בבית</h3>
   ${chk("apps",[
    ["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה",""],
