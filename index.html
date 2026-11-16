@@ -169,6 +169,17 @@ a,.show,.tpb,.tools button,.cam,#locBtn,.wxc,#ocrBox .x,.reset,#hereA button,#oc
 .card{border-color:#e6b8ba}
 .card .he{color:var(--act)!important;font-weight:700}
 .btn,.btn.pri{font-weight:700}
+
+/* ---- open days: still a draft, shown in soft blue ---- */
+:root{--tent:#3a78c2;--tent-bg:#f1f6fc}
+.st.tent .head .t{color:var(--tent)}
+.st.tent .body{color:var(--tent)}
+.st.tent .body .warn{color:var(--tent);background:var(--tent-bg)}
+.st.tent{border-bottom-style:dashed}
+.st.tent.next{background:var(--tent-bg);box-shadow:inset -3px 0 0 var(--tent)}
+.tbadge{display:inline-block;vertical-align:middle;font-size:12px!important;font-weight:600;color:var(--tent);border:1px dashed var(--tent);border-radius:99px;padding:0 8px;margin-inline-start:6px}
+ul.chk li.tentli .txt{color:var(--tent)}
+ul.chk li.tentli .lbl::after{content:"טיוטה";font-size:11px;font-weight:600;border:1px dashed var(--tent);border-radius:99px;padding:0 6px;margin-inline-start:6px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -519,7 +530,7 @@ const STEPS=[
    ["שיתוף בדוג'ו ב"+T("budokan")+", טורניר קנדו נוער",""],
    "הרצאות וטקס פרסים",
    "חוזרים לישון בבית"])}`},
- {id:"fuji",t:"הר פוג׳י",d:"שני–רביעי 14–16.12 · 2 לילות בקוואגוצ׳יקו",html:()=>`
+ {id:"fuji",tent:true,t:"הר פוג׳י",d:"שני–רביעי 14–16.12 · 2 לילות בקוואגוצ׳יקו",html:()=>`
   <div class="sub">הצעה, לפי המקומות שסימנת במפות. המסלול: ${T("tsuru")} ← אודקיו ← ${T("shinmatsuda")} ← JR ← ${T("gotemba")} ← ${T("bus")} ← ${T("kawaguchiko")}. כ־2.5–3 שעות.</div>
   ${TP([["Tsurumaki-Onsen","Gotemba"],["Gotemba","Kawaguchiko"]])}
   <h3>שני 14.12 · יציאה מהבית ונסיעה לפוג׳י</h3>
@@ -536,7 +547,7 @@ const STEPS=[
    "רכבל Kachi Kachi לתצפית על ההר והאגם",
    "בערב: אונסן עם נוף לפוג׳י"])}
   <div class="warn">פוג׳י מתחבא בעננים הרבה פעמים. אם בבוקר של 15.12 ההר לא נראה, לנסות שוב בבוקר של 16.12 לפני הנסיעה.</div>`},
- {id:"kyoto",t:"קיוטו",d:"רביעי–שבת 16–19.12 · 3 לילות",html:()=>`
+ {id:"kyoto",tent:true,t:"קיוטו",d:"רביעי–שבת 16–19.12 · 3 לילות",html:()=>`
   <div class="sub">המסלול: ${T("kawaguchiko")} ← ${T("bus","אוטובוס")} ← ${T("mishima")} ← ${T("shinkansen")} ← ${T("kyoto")}. כ־4.5 שעות.</div>
   ${TP([["Kawaguchiko","Mishima"],["Mishima","Kyoto"]])}
   <h3>רביעי 16.12 · נסיעה לקיוטו</h3>
@@ -555,7 +566,7 @@ const STEPS=[
    [T("butokuden")+", אולם אמנויות הלחימה ההיסטורי, ליד מקדש הייאן",""],
    "ארשיאמה (Arashiyama 嵐山): יער הבמבוק והנהר",
    "קינקקו־ג׳י (Kinkaku-ji 金閣寺), מקדש הזהב"])}`},
- {id:"hiroshima",t:"הירושימה ומיאג׳ימה",d:"שבת–ראשון 19–20.12 · לילה אחד",html:()=>`
+ {id:"hiroshima",tent:true,t:"הירושימה ומיאג׳ימה",d:"שבת–ראשון 19–20.12 · לילה אחד",html:()=>`
   <div class="sub">המסלול: ${T("kyoto")} ← ${T("shinkansen")} ← ${T("hiroshima")}. כשעה ו־40 דק׳.</div>
   ${TP([["Kyoto","Hiroshima"],["Hiroshima","Miyajimaguchi"],["Hiroshima","Tokyo"]])}
   <h3>שבת 19.12</h3>
@@ -570,7 +581,7 @@ const STEPS=[
    "השער הצף והאיילים, חוזרים עד הצהריים",
    ["שינקנסן Nozomi מהירושימה ל"+T("tokyo")+" "+J("東京",0)+".",sh("shintokyo","להראות בקופה")+" <span class='dur'>כ־4 שעות</span>"]])}
   <div class="warn">המראה של השער הצף תלוי בגאות. בשפל אפשר ללכת עד אליו ברגל. כדאי לבדוק את טבלת הגאות של מיאג׳ימה.</div>`},
- {id:"tokyo",t:"טוקיו",d:"ראשון–חמישי 20–24.12 · 4 לילות",html:()=>`
+ {id:"tokyo",tent:true,t:"טוקיו",d:"ראשון–חמישי 20–24.12 · 4 לילות",html:()=>`
   <div class="sub">שלושה ימים מלאים בטוקיו, והטיסה ביום חמישי ב־15:45.</div>
   ${TP([["Tokyo","Suidobashi"],["Tokyo","Asakusa"]])}
   <h3>שני 21.12</h3>
@@ -640,12 +651,13 @@ function render(){
   acc.innerHTML=STEPS.map((s,i)=>{
     const st=stat(s),isNext=i===nx,isOpen=i===open;
     const tag=s.always?"":st.done?"הושלם":isNext?`הבא · ${st.d}/${st.n}`:st.d?`${st.d}/${st.n}`:"";
-    return `<div class="st ${st.done&&!s.always?"done":""} ${isNext?"next":""} ${isOpen?"open":""}" id="${s.id}">
+    return `<div class="st ${s.tent?"tent":""} ${st.done&&!s.always?"done":""} ${isNext?"next":""} ${isOpen?"open":""}" id="${s.id}">
      <button class="head" data-i="${i}" aria-expanded="${isOpen}"><span class="num">${s.always?"·":st.done?"✓":i+1}</span>
-      <span><div class="t">${s.t}</div><div class="d">${s.d}</div></span>
+      <span><div class="t">${s.t}${s.tent?` <span class="tbadge">טיוטה</span>`:""}</div><div class="d">${s.d}</div></span>
       <span class="tag"><span class="tt">${tag}</span><span class="chev">‹</span></span></button>
      <div class="body" ${isOpen?"":"hidden"}>${s.html()}</div></div>`}).join("");
   acc.querySelectorAll("input[data-k]").forEach(c=>{c.checked=isChecked(c.dataset.k);c.closest("li").classList.toggle("ck",c.checked)});
+  acc.querySelectorAll("input[data-k]").forEach(c=>{if(TENT_KEYS.has(c.dataset.k))c.closest("li").classList.add("tentli")});
   acc.querySelectorAll("ul.chk").forEach(sortList);
   acc.querySelectorAll("textarea[data-note]").forEach(t=>t.value=store.get("n:"+t.dataset.note,""));
 }
@@ -654,6 +666,7 @@ acc.addEventListener("click",e=>{
   const h=e.target.closest(".head");if(h){const i=+h.dataset.i;setOpen(open===i?-1:i);render()}
 });
 /* Like Google Keep: checked items move to the bottom of their list, unchecked ones go back to their original place */
+const TENT_KEYS=new Set(["prep-2","prep-3","prep-4","prep-5","prep-6"]);
 function sortList(ul){const items=[...ul.children];items.forEach((li,i)=>{if(li.dataset.o==null)li.dataset.o=i});
  items.sort((x,y)=>(x.classList.contains("ck")-y.classList.contains("ck"))||(x.dataset.o-y.dataset.o)).forEach(li=>ul.appendChild(li))}
 function moveItem(li){const ul=li.parentNode,first=li.getBoundingClientRect().top;sortList(ul);
