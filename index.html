@@ -181,7 +181,7 @@ a,.show,.tpb,.tools button,.cam,#locBtn,.wxc,#ocrBox .x,.reset,#hereA button,#oc
 ul.chk li.tentli .txt{color:var(--tent)}
 ul.chk li.tentli .lbl::after{content:"טיוטה";font-size:11px;font-weight:600;border:1px dashed var(--tent);border-radius:99px;padding:0 6px;margin-inline-start:6px;vertical-align:middle}
 
-.msgbox{margin:6px 0 4px;background:#f6f6f4;border:1px solid #ececea;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.55;user-select:text}
+.msgbox{white-space:pre-line;margin:6px 0 4px;background:#f6f6f4;border:1px solid #ececea;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.55;user-select:text}
 </style>
 </head>
 <body>
@@ -441,7 +441,9 @@ const STEPS=[
    ["prep-15","המצגות ב־PowerPoint על דיסק און קי"]])}
   <h3>עדכונים לפני הנסיעה</h3>
   ${chkK([
-   ["msg-ron",["לעדכן את רון בוואטסאפ: לא אהיה בפלוומושן בקיר בימי ראשון 6.12, 13.12 ו־20.12","<div class='msgbox' id='msgRon'>היי רון, רק מעדכן שלא אהיה בפלוומושן בקיר בימי ראשון 6.12, 13.12 ו־20.12 (ב־13 וב־20 אני בחו״ל). חוזר ב־27.12 🙏</div><button class='show' data-copy='msgRon'>להעתיק את ההודעה</button>"]]])}
+   ["msg-ron",["לעדכן את רון בוואטסאפ: לא אהיה בפלוומושן בקיר בימי ראשון 6.12, 13.12 ו־20.12","<div class='msgbox' id='msgRon'>היי רון, רק מעדכן לגבי פלוומושן בקיר:
+לא אהיה בימי ראשון 6.12, 13.12 ו־20.12.
+חוזר ב־27.12 🙏</div><button class='show' data-copy='msgRon'>להעתיק את ההודעה</button>"]]])}
   <h3>אפליקציות להתקין בבית</h3>
   ${chkK([
    ["apps-0",["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה",""]],
