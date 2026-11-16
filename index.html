@@ -182,6 +182,20 @@ ul.chk li.tentli .txt{color:var(--tent)}
 ul.chk li.tentli .lbl::after{content:"טיוטה";font-size:11px;font-weight:600;border:1px dashed var(--tent);border-radius:99px;padding:0 6px;margin-inline-start:6px;vertical-align:middle}
 
 .msgbox{white-space:pre-line;margin:6px 0 4px;background:#f6f6f4;border:1px solid #ececea;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.55;user-select:text}
+
+.tgroup{border-bottom:1px dashed var(--tent)}
+.tg-head{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:baseline;width:100%;background:none;border:0;padding:18px 0;text-align:start;cursor:pointer}
+.tg-head .t{font-size:20px;font-weight:700;color:var(--tent)}
+.tg-head .d{font-size:15.5px;color:var(--tent)}
+.tg-head .num,.tg-head .tag{color:var(--tent);font-size:15.5px}
+.tgroup.open .tg-head .chev{transform:rotate(-90deg)}
+.tg-body{padding-inline-start:14px;border-inline-start:2px dashed var(--tent);margin-bottom:10px}
+details.tdraft{border:1px dashed var(--tent);border-radius:10px;padding:8px 12px;color:var(--tent)}
+details.tdraft summary{cursor:pointer;font-weight:700;font-size:16px;list-style:none}
+details.tdraft summary::-webkit-details-marker{display:none}
+details.tdraft summary::after{content:"‹";float:inline-end;transition:transform .2s}
+details.tdraft[open] summary::after{transform:rotate(-90deg)}
+details.tdraft[open] summary{margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -410,12 +424,15 @@ const STEPS=[
   <h3>הזמנות ולינה</h3>
   ${chkK([
    ["prep-0",["להזמין את הבית ב־Airbnb, 10–14.12 (4 לילות)","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"]],
-   ["prep-1","לשאול את המארחת הירומי איך מחממים את הבית"],
+   ["prep-1","לשאול את המארחת הירומי איך מחממים את הבית"]])}
+  <details class="tdraft"><summary>לינה והזמנות לימים הפתוחים <span class="tbadge">טיוטה</span></summary>
+  ${chkK([
    ["prep-2","לינה בקוואגוצ׳יקו 14–16.12 (2 לילות)"],
    ["prep-3","לינה בקיוטו 16–19.12 (3 לילות)"],
    ["prep-4","לינה בהירושימה 19–20.12 (לילה אחד)"],
    ["prep-5","לינה בטוקיו 20–24.12 (4 לילות), קרוב לתחנת טוקיו או שינג׳וקו"],
    ["prep-6","להזמין מראש: Samurai Ninja Museum בקיוטו, Unko Museum בטוקיו"]])}
+  </details>
   <h3>מסמכים וכניסה ליפן</h3>
   ${chkK([
    ["prep-7","דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק"],
@@ -651,23 +668,38 @@ const nextIdx=()=>STEPS.findIndex(s=>!s.always&&!stat(s).done);
 let open=store.get("open3",null);
 if(open===null)open=nextIdx();
 const acc=document.getElementById("acc");
-function render(){
-  const nx=nextIdx();
-  acc.innerHTML=STEPS.map((s,i)=>{
+function stepHtml(s,i,nx){
     const st=stat(s),isNext=i===nx,isOpen=i===open;
     const tag=s.always?"":st.done?"הושלם":isNext?`הבא · ${st.d}/${st.n}`:st.d?`${st.d}/${st.n}`:"";
     return `<div class="st ${s.tent?"tent":""} ${st.done&&!s.always?"done":""} ${isNext?"next":""} ${isOpen?"open":""}" id="${s.id}">
      <button class="head" data-i="${i}" aria-expanded="${isOpen}"><span class="num">${s.always?"·":st.done?"✓":i+1}</span>
-      <span><div class="t">${s.t}${s.tent?` <span class="tbadge">טיוטה</span>`:""}</div><div class="d">${s.d}</div></span>
+      <span><div class="t">${s.t}</div><div class="d">${s.d}</div></span>
       <span class="tag"><span class="tt">${tag}</span><span class="chev">‹</span></span></button>
-     <div class="body" ${isOpen?"":"hidden"}>${s.html()}</div></div>`}).join("");
+     <div class="body" ${isOpen?"":"hidden"}>${s.html()}</div></div>`}
+function render(){
+  const nx=nextIdx();
+  const tIdx=STEPS.map((s,i)=>s.tent?i:-1).filter(i=>i>=0);
+  if(tIdx.includes(open))tgOpen=true;
+  let html="";
+  STEPS.forEach((s,i)=>{
+    if(s.tent&&i===tIdx[0]){
+      const hasNext=tIdx.includes(nx),dates="14–24.12";
+      html+=`<div class="tgroup ${tgOpen?"open":""}"><button class="tg-head" aria-expanded="${tgOpen}"><span class="num">…</span>
+        <span><div class="t">הימים הפתוחים <span class="tbadge">טיוטה</span></div><div class="d">${dates} · פוג׳י, קיוטו, הירושימה, טוקיו</div></span>
+        <span class="tag"><span class="tt">${hasNext?"הבא":""}</span><span class="chev">‹</span></span></button><div class="tg-body" ${tgOpen?"":"hidden"}>`}
+    html+=stepHtml(s,i,nx);
+    if(s.tent&&i===tIdx[tIdx.length-1])html+=`</div></div>`;
+  });
+  acc.innerHTML=html;
   acc.querySelectorAll("input[data-k]").forEach(c=>{c.checked=isChecked(c.dataset.k);c.closest("li").classList.toggle("ck",c.checked)});
   acc.querySelectorAll("input[data-k]").forEach(c=>{if(TENT_KEYS.has(c.dataset.k))c.closest("li").classList.add("tentli")});
   acc.querySelectorAll("ul.chk").forEach(sortList);
   acc.querySelectorAll("textarea[data-note]").forEach(t=>t.value=store.get("n:"+t.dataset.note,""));
 }
+let tgOpen=!!store.get("tgopen",false);
 function setOpen(i){open=i;store.set("open3",i)}
 acc.addEventListener("click",e=>{
+  const g=e.target.closest(".tg-head");if(g){tgOpen=!tgOpen;store.set("tgopen",tgOpen);if(!tgOpen&&STEPS[open]&&STEPS[open].tent)setOpen(-1);render();return}
   const h=e.target.closest(".head");if(h){const i=+h.dataset.i;setOpen(open===i?-1:i);render()}
 });
 /* Like Google Keep: checked items move to the bottom of their list, unchecked ones go back to their original place */
