@@ -383,7 +383,7 @@ const STEPS=[
    "ג'ודוגי לבן",
    "המצגות ב־PowerPoint על דיסק און קי",
    "צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"])}
-  <details class="pack"><summary>ביגוד וציוד לכנס</summary>
+  <h3>ביגוד וציוד לכנס</h3>
   ${chk("pack",[
    ["שישי, הרצאות ומסיבה: לבוש מסודר","<span class='dur'>מכנסיים מחויטים או צ׳ינו, חולצה מכופתרת, ז׳קט או סוודר</span>"],
    ["ג׳ודוגי לבן לשבת ולראשון","<span class='dur'>דרישה של הכנס</span>"],
@@ -391,7 +391,6 @@ const STEPS=[
    ["מעיל חם, שכבות, צעיף, תרמית","<span class='dur'>3–13° בדצמבר, הדוג׳ו יכול להיות קר</span>"],
    ["נעליים שקל לחלוץ, גרביים שלמות","<span class='dur'>חולצים נעליים בדוג׳ו ובהרבה מקומות</span>"],
    "מגבת קטנה"])}
-  </details>
   <h3>אפליקציות להתקין בבית</h3>
   ${chk("apps",[
    ["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה",""],
@@ -612,16 +611,23 @@ function render(){
       <span class="tag"><span class="tt">${tag}</span><span class="chev">‹</span></span></button>
      <div class="body" ${isOpen?"":"hidden"}>${s.html()}</div></div>`}).join("");
   acc.querySelectorAll("input[data-k]").forEach(c=>{c.checked=isChecked(c.dataset.k);c.closest("li").classList.toggle("ck",c.checked)});
+  acc.querySelectorAll("ul.chk").forEach(sortList);
   acc.querySelectorAll("textarea[data-note]").forEach(t=>t.value=store.get("n:"+t.dataset.note,""));
 }
 function setOpen(i){open=i;store.set("open3",i)}
 acc.addEventListener("click",e=>{
   const h=e.target.closest(".head");if(h){const i=+h.dataset.i;setOpen(open===i?-1:i);render()}
 });
+/* Like Google Keep: checked items move to the bottom of their list, unchecked ones go back to their original place */
+function sortList(ul){const items=[...ul.children];items.forEach((li,i)=>{if(li.dataset.o==null)li.dataset.o=i});
+ items.sort((x,y)=>(x.classList.contains("ck")-y.classList.contains("ck"))||(x.dataset.o-y.dataset.o)).forEach(li=>ul.appendChild(li))}
+function moveItem(li){const ul=li.parentNode,first=li.getBoundingClientRect().top;sortList(ul);
+ const d=first-li.getBoundingClientRect().top;if(d&&!matchMedia("(prefers-reduced-motion: reduce)").matches){li.animate([{transform:`translateY(${d}px)`},{transform:"none"}],{duration:280,easing:"ease-out"})}}
 acc.addEventListener("change",e=>{
   const k=e.target.dataset.k;if(!k)return;
   mem[k]=e.target.checked;store.set("c:"+k,e.target.checked);
   e.target.closest("li").classList.toggle("ck",e.target.checked);
+  {const li=e.target.closest("li");setTimeout(()=>moveItem(li),180)}
   const i=STEPS.findIndex(s=>keysOf(s).includes(k));
   const st=stat(STEPS[i]);
   // update the header counter without re-rendering the open section
@@ -828,7 +834,9 @@ sres.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)r
  const [si,ei]=b.dataset.sgo.split(":").map(Number);
  q.value="";search();setOpen(si);render();
  const stEl=document.getElementById(STEPS[si].id);
- const target=ei>=0?stEl.querySelectorAll(".body "+SEL.split(",").join(",.body "))[ei]:stEl;
+ const want=(IDX||[]).find(x=>x.k==="step"&&x.si===si&&x.ei===ei);
+ const cands=[...stEl.querySelectorAll(".body "+SEL.split(",").join(",.body "))];
+ const target=ei<0?stEl:(want&&cands.find(el=>el.textContent.replace(/\s+/g," ").trim()===want.txt))||cands[ei];
  (target||stEl).scrollIntoView({behavior:"smooth",block:"center"});
  if(target){target.classList.remove("flash");void target.offsetWidth;target.classList.add("flash")}
 });
