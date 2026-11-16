@@ -142,6 +142,33 @@ details.pack summary::-webkit-details-marker{display:none}
 details.pack summary::after{content:"‹";float:inline-end;color:#73777d;transition:transform .2s}
 details.pack[open] summary::after{transform:rotate(-90deg)}
 details.pack[open] summary{margin-bottom:6px}
+
+/* ---- larger text throughout ---- */
+body{font-size:18px!important}
+h1{font-size:29px!important}
+.meta,.times,.infobar .locbar{font-size:15.5px!important}
+.head .t{font-size:20px!important}
+.head .d,.tag{font-size:15.5px!important}
+h3{font-size:14.5px!important}
+.sub,.dur,.warn,.key{font-size:16px!important}
+dl.facts,ul.plain,dl.gloss{font-size:16.5px!important}
+.card .he,.card .ro{font-size:15.5px!important}
+.card .ja{font-size:22px!important}
+.srch input{font-size:17.5px!important}
+#sres .r .x{font-size:17px!important}
+#ocrBox .tr{font-size:20px!important}
+footer{font-size:14.5px!important}
+/* ---- everything you can press: red and bold ---- */
+:root{--act:#c41e24}
+a,.show,.tpb,.tools button,.cam,#locBtn,.wxc,#ocrBox .x,.reset,#hereA button,#ocrBox .hits button,.tp .tpl,#tipX,#close{color:var(--act)!important;font-weight:700!important}
+.show,.tools button,.cam,#ocrBox .x,.reset,#hereA button,a{text-decoration-color:currentColor}
+.tpb,#locBtn,.wxc,#ocrBox .hits button{border-color:var(--act)!important}
+.tpb,#locBtn,.show,.tools button,.cam{font-size:16px!important}
+.term .en{color:var(--act)!important;font-weight:700}
+.term{border-bottom-color:var(--act)!important}
+.card{border-color:#e6b8ba}
+.card .he{color:var(--act)!important;font-weight:700}
+.btn,.btn.pri{font-weight:700}
 </style>
 </head>
 <body>
