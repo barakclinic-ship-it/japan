@@ -202,6 +202,10 @@ details.tdraft[open] summary{margin-bottom:6px}
 .price{background:none!important;border:1.5px solid #b7791f!important;color:#9a5b0f!important;font-weight:700!important;font-size:15px!important;padding:0 7px!important;border-radius:6px!important;box-shadow:none}
 .price.paid{border-color:#1f9d55!important;color:#1a7f45!important}
 dl.paidlist dd{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+
+/* links in blue (buttons stay red) */
+a{color:#1a5fb4!important;font-weight:600!important;text-decoration:underline;text-underline-offset:3px}
+.applinks{font-size:15.5px}
 </style>
 </head>
 <body>
@@ -458,17 +462,17 @@ const STEPS=[
    ["msg-ron",["לעדכן את רון בוואטסאפ: לא אהיה בפלוומושן בקיר בימי ראשון 6.12, 13.12 ו־20.12","<div class='msgbox' id='msgRon'>היי רון, רק מעדכן לגבי פלוומושן בקיר:\nלא אהיה בימי ראשון 6.12, 13.12 ו־20.12.\nחוזר ב־27.12 🙏</div><button class='show' data-copy='msgRon'>להעתיק את ההודעה</button>"]]])}
   <h3>אפליקציות להתקין בבית</h3>
   ${chkK([
-   ["apps-0",["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה",""]],
-   ["apps-1",["<b>Google Translate</b>: להוריד את השפה היפנית לשימוש אופליין. מצב מצלמה מתרגם שלטים ותפריטים",""]],
-   ["apps-2",["<b>Japan Transit Planner</b> (Jorudan) או <b>NAVITIME</b>: מתכנן רכבות יפני, מדויק יותר בסוגי הרכבות",""]],
-   ["apps-3",["<b>Suica</b>: באייפון דרך Apple Wallet. באנדרואיד: Welcome Suica Mobile, או כרטיס פיזי בשדה",""]],
-   ["apps-4",["<b>esimo</b>: להתקין את ה־eSIM בבית, על WiFi",""]],
-   ["apps-5",["<b>Airbnb</b>: הכתובת, קוד הכניסה וההודעות להירומי",""]],
-   ["apps-6",["<b>EL AL</b>: צ'ק־אין וכרטיס עלייה למטוס",""]],
-   ["apps-7",["<b>GO</b>: הזמנת מוניות ביפן, עם תשלום באשראי",""]],
-   ["apps-8",["<b>Safety tips</b>: אפליקציה רשמית של יפן להתראות על רעידות אדמה, באנגלית",""]],
-   ["apps-9",["<b>WhatsApp</b>: קשר עם מייק מהכנס",""]],
-   ["apps-10",["האפליקציה הזו מותקנת בטלפון, וזיהוי המיקום מופעל",""]]])}
+   ["apps-0",["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה","<span class='applinks'><a href='https://play.google.com/store/apps/details?id=com.google.android.apps.maps' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-1",["<b>Google Translate</b>: להוריד את השפה היפנית לשימוש אופליין. מצב מצלמה מתרגם שלטים ותפריטים","<span class='applinks'><a href='https://play.google.com/store/apps/details?id=com.google.android.apps.translate' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-2",["<b>Japan Transit Planner</b> (Jorudan) או <b>NAVITIME</b>: מתכנן רכבות יפני, מדויק יותר בסוגי הרכבות","<span class='applinks'><a href='https://play.google.com/store/apps/details?id=jp.co.jorudan.nrkj' target='_blank' rel='noopener'>Transit Planner</a> · <a href='https://play.google.com/store/search?q=NAVITIME%20Japan%20Travel&c=apps' target='_blank' rel='noopener'>NAVITIME</a></span>"]],
+   ["apps-3",["<b>Suica</b>: באייפון דרך Apple Wallet. באנדרואיד: Welcome Suica Mobile, או כרטיס פיזי בשדה","<span class='applinks'><a href='https://play.google.com/store/search?q=Welcome%20Suica%20Mobile&c=apps' target='_blank' rel='noopener'>Welcome Suica Mobile</a></span>"]],
+   ["apps-4",["<b>esimo</b>: להתקין את ה־eSIM בבית, על WiFi","<span class='applinks'><a href='https://esimo.io/product/japan' target='_blank' rel='noopener'>esimo ליפן</a></span>"]],
+   ["apps-5",["<b>Airbnb</b>: הכתובת, קוד הכניסה וההודעות להירומי","<span class='applinks'><a href='https://play.google.com/store/apps/details?id=com.airbnb.android' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-6",["<b>EL AL</b>: צ'ק־אין וכרטיס עלייה למטוס","<span class='applinks'><a href='https://play.google.com/store/search?q=EL%20AL%20Israel%20Airlines&c=apps' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-7",["<b>GO</b>: הזמנת מוניות ביפן, עם תשלום באשראי","<span class='applinks'><a href='https://play.google.com/store/search?q=GO%20taxi%20app%20Japan&c=apps' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-8",["<b>Safety tips</b>: אפליקציה רשמית של יפן להתראות על רעידות אדמה, באנגלית","<span class='applinks'><a href='https://play.google.com/store/search?q=Safety%20tips%20Japan%20Tourism%20Agency&c=apps' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-9",["<b>WhatsApp</b>: קשר עם מייק מהכנס","<span class='applinks'><a href='https://play.google.com/store/apps/details?id=com.whatsapp' target='_blank' rel='noopener'>Google Play</a></span>"]],
+   ["apps-10",["האפליקציה הזו מותקנת בטלפון, וזיהוי המיקום מופעל","<span class='applinks'><a href='https://barakclinic-ship-it.github.io/japan/' target='_blank' rel='noopener'>האפליקציה</a></span>"]]])}
   <h3>תיק עלייה למטוס</h3>
   <dl class="facts">
    <dt>טרולי</dt><dd>עד <b>8 ק״ג</b>, עד 56×45×25 ס״מ</dd>
