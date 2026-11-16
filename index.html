@@ -180,6 +180,8 @@ a,.show,.tpb,.tools button,.cam,#locBtn,.wxc,#ocrBox .x,.reset,#hereA button,#oc
 .tbadge{display:inline-block;vertical-align:middle;font-size:12px!important;font-weight:600;color:var(--tent);border:1px dashed var(--tent);border-radius:99px;padding:0 8px;margin-inline-start:6px}
 ul.chk li.tentli .txt{color:var(--tent)}
 ul.chk li.tentli .lbl::after{content:"טיוטה";font-size:11px;font-weight:600;border:1px dashed var(--tent);border-radius:99px;padding:0 6px;margin-inline-start:6px;vertical-align:middle}
+
+.msgbox{margin:6px 0 4px;background:#f6f6f4;border:1px solid #ececea;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.55;user-select:text}
 </style>
 </head>
 <body>
@@ -437,6 +439,9 @@ const STEPS=[
   ${chkK([
    ["prep-13","מתאם חשמל לשקע אמריקאי שטוח (Type A)"],
    ["prep-15","המצגות ב־PowerPoint על דיסק און קי"]])}
+  <h3>עדכונים לפני הנסיעה</h3>
+  ${chkK([
+   ["msg-ron",["לעדכן את רון בוואטסאפ: לא אהיה בפלוומושן בקיר בימי ראשון 13.12 ו־20.12","<div class='msgbox' id='msgRon'>היי רון, רק מעדכן שאני בחו״ל בין 9 ל־24 בדצמבר, אז לא אהיה בפלוומושן בקיר בימי ראשון 13.12 ו־20.12. חוזר ב־27.12 🙏</div><button class='show' data-copy='msgRon'>להעתיק את ההודעה</button>"]]])}
   <h3>אפליקציות להתקין בבית</h3>
   ${chkK([
    ["apps-0",["<b>Google Maps</b>: מסלולי רכבת עם שעות, רציפים ויציאות. להוריד מפה אופליין של אזור טוקיו וקנגאווה",""]],
@@ -1009,6 +1014,14 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-tp-t
   else window.open("https://world.jorudan.co.jp/mln/en/","_blank","noopener");
  },700);
 });
+</script>
+
+<script>
+/* Copy a ready message (WhatsApp etc.) */
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-copy]");if(!b)return;e.preventDefault();
+ const el=document.getElementById(b.dataset.copy);if(!el)return;const t=el.textContent.trim();
+ try{await navigator.clipboard.writeText(t);(window.toast2||alert)("ההודעה הועתקה. להדביק בוואטסאפ")}
+ catch(_){const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);(window.toast2||alert)("סימנתי את ההודעה, להעתיק ידנית")}});
 </script>
 </body>
 </html>
