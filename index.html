@@ -198,6 +198,10 @@ details.tdraft[open] summary::after{transform:rotate(-90deg)}
 details.tdraft[open] summary{margin-bottom:6px}
 
 .price{display:inline-block;font-size:14.5px;font-weight:700;color:#1d1f22;background:#fff4d6;border:1px solid #f0d78a;border-radius:6px;padding:0 7px;margin-inline-end:6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.price{background:#ffcf33!important;border:0!important;color:#111!important;font-weight:800!important;font-size:15px!important;padding:1px 8px!important;border-radius:6px!important;box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.price.paid{background:#1f9d55!important;color:#fff!important}
+dl.paidlist dd{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
 </style>
 </head>
 <body>
@@ -417,9 +421,14 @@ const J=(s,ro=1)=>`<span class="jp">${s}</span>${ro&&JR[s]?` <span class="rj">${
 
 const STEPS=[
  {id:"prep",t:"לפני היציאה",d:"עד 8.12",html:()=>`
+  <h3>מה כבר שולם</h3>
+  <dl class="facts paidlist">
+   <dt>טיסות הלוך־חזור</dt><dd><span class="price paid">✓ שולם ₪8,280</span><span class="dur">אל על דרך לכיש תיירות, העברה בנקאית 1.11.2026</span></dd>
+   <dt>הרשמה לכנס</dt><dd><span class="price paid">✓ שולם £140</span><span class="dur">Judospace דרך PayPal, 10.9.2026</span></dd>
+  </dl>
   <h3>הזמנות ולינה</h3>
   ${chkK([
-   ["prep-0",["להזמין את הבית ב־Airbnb, 10–14.12 (4 לילות)","<span class='dur'>884 ₪ · ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"]],
+   ["prep-0",["להזמין את הבית ב־Airbnb, 10–14.12 (4 לילות)","<span class='price'>884 ₪</span><span class='dur'>ביטול חינם עד 9.12 · <a href='https://he.airbnb.com/rooms/1747518070781832566?check_in=2026-12-10&check_out=2026-12-14&guests=2&adults=2' target='_blank' rel='noopener'>המודעה</a></span>"]],
    ["prep-1","לשאול את המארחת הירומי איך מחממים את הבית"]])}
   <h3>מסמכים וכניסה ליפן</h3>
   ${chkK([
@@ -468,7 +477,7 @@ const STEPS=[
   </dl>
   <div class="warn">אם נוסעים בלי מזוודה לבטן, הכול צריך להיכנס ל־8 ק״ג, כולל ג'ודוגי. נוזלים עד 100 מ״ל בשקית שקופה. סוללות ומטען נייד רק בתיק העלייה. כדאי לוודא באתר של אל על, כי הכללים משתנים לפי סוג הכרטיס.</div>`},
  {id:"dep",t:"המראה מנתב״ג",d:"רביעי 9.12 · 19:00",html:()=>`
-  <div><div class="big">19:00</div><div class="sub">טיסה LY 091 · טרמינל 3 · מושב 44B · מזוודה אחת · הזמנה 9XSQI6</div></div>
+  <div><div class="big">19:00</div><div class="sub">טיסה LY 091 · טרמינל 3 · מושב 44B · מזוודה אחת · הזמנה 9XSQI6 <span class="price paid">✓ שולם ₪8,280 הלוך־חזור</span></div></div>
   ${chk("dep",["להגיע לטרמינל 3 עד 16:00","מסירת מזוודה וביקורת ביטחון","עלייה למטוס"])}`},
  {id:"land",t:"נחיתה בנריטה",d:"חמישי 10.12 · 13:30 שעון יפן",html:()=>`
   <div><div class="big">13:30</div><div class="sub">06:30 בבוקר בישראל</div></div>
@@ -513,6 +522,7 @@ const STEPS=[
   </dl>
   <div class="warn">אין גלאי עשן בבית, לפי המודעה.</div>`},
  {id:"day1",t:"כנס · יום שישי",d:"11.12 · 09:30–17:30 · מסיבת פתיחה 18:30",html:()=>`
+  <div class="sub">הרשמה לכנס <span class="price paid">✓ שולם £140</span></div>
   <div class="sub">המסלול: הבית ← ${T("tsuru")} ← תחנה אחת ← ${T("tokaist")} ← הליכה ל${T("shonan")}</div>
   ${TP([["Tsurumaki-Onsen","Tokaidaigakumae"]])}
   ${chk("day1",[
@@ -545,7 +555,7 @@ const STEPS=[
   <h3>לאן ממשיכים</h3>
   <textarea data-note="next" placeholder="היעד הבא ואיך מגיעים"></textarea>`},
  {id:"ret",t:"טיסה הביתה",d:"חמישי 24.12 · 15:45 מנריטה",html:()=>`
-  <div><div class="big">15:45</div><div class="sub">טיסה LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50</div></div>
+  <div><div class="big">15:45</div><div class="sub">טיסה LY 092 · טרמינל 1 · מושב 24G · 2 מזוודות · נחיתה בנתב״ג 21:50 <span class="price paid">✓ שולם כלול בכרטיס</span></div></div>
   <div class="sub">המסלול: ${T("tokyo","תחנת טוקיו")} או ${T("shinjuku")} ← רכבת ${T("nex")} ← ${T("narita")} ${T("t1")}. מתחנת טוקיו כשעה.</div>
   ${TP([["Tokyo","Narita Airport Terminal 1"],["Shinjuku","Narita Airport Terminal 1"]])}
   <div class="key">שוב קונים את כרטיס הנריטה אקספרס במקום, בקופה של JR בתחנה שיוצאים ממנה. להיות בשדה עד 12:45.</div>
