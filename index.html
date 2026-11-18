@@ -206,6 +206,7 @@ dl.paidlist dd{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
 /* links in blue (buttons stay red) */
 a{color:#1a5fb4!important;font-weight:600!important;text-decoration:underline;text-underline-offset:3px}
 .applinks{font-size:15.5px}
+.qrbox{border:1px solid #e3e3e3;border-radius:12px;padding:12px;margin:10px 0}.qrh{font-weight:700;margin-bottom:8px}.qrgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.qrcell{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}.qrn{font-weight:700}.qrimg{width:100%;max-width:220px;border-radius:8px;cursor:zoom-in}.qrload{cursor:pointer}.qrdel{background:none;border:0;color:#888;font-size:.85em;text-decoration:underline}.qrfull{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px}.qrfull img{max-width:100%;max-height:100%}
 </style>
 </head>
 <body>
@@ -440,7 +441,7 @@ const STEPS=[
    ["prep-7","דרכון בתוקף 6 חודשים לפחות, עם עמוד ריק"],
    ["prep-8","ביטוח נסיעות ל־9–24.12"],
    ["chk-passport",["להשוות את פספורטכארד לביטוחים אחרים (מחיר, כיסוי רפואי, ספורט ופעילות בדוג׳ו, ציוד)","<span class='dur'>לבדוק גם אם פעילות בדוג׳ו מכוסה, ולא נחשבת ספורט אתגרי</span>"]],
-   ["prep-9",["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) באתר הרשמי <a href='https://vjw-lp.digital.go.jp/en/' target='_blank' rel='noopener'>vjw-lp.digital.go.jp</a>, בחינם. לרשום גם את עמית באותו חשבון","<span class='dur'>1. Sign up: אימייל וסיסמה, ואז קוד אימות שמגיע למייל. 2. פרטי דרכון (My page). 3. Register planned entry: טיסה LY 091, 10.12, נריטה, וכתובת הבית מ־Airbnb. 4. Immigration ו־Customs. 5. Display QR code, ולצלם מסך. עד שבוע לפני הטיסה</span>"]],
+   ["prep-9",["למלא את "+T("vjw","טופס הכניסה")+" (הגירה ומכס) באתר הרשמי <a href='https://vjw-lp.digital.go.jp/en/' target='_blank' rel='noopener'>vjw-lp.digital.go.jp</a>, בחינם. לרשום גם את עמית באותו חשבון. בוצע 18.11, הקודים בדרייב (2026 יפן) ובשלב הנחיתה","<span class='dur'>1. Sign up: אימייל וסיסמה, ואז קוד אימות שמגיע למייל. 2. פרטי דרכון (My page). 3. Register planned entry: טיסה LY 091, 10.12, נריטה, וכתובת הבית מ־Airbnb. 4. Immigration ו־Customs. 5. Display QR code, ולצלם מסך. עד שבוע לפני הטיסה</span>"]],
    ["prep-16","צ'ק־אין אונליין באל על (נפתח 24 שעות לפני)"]])}
   <h3>כסף ותקשורת</h3>
   ${chkK([
@@ -490,6 +491,7 @@ const STEPS=[
  {id:"land",t:"נחיתה בנריטה",d:"חמישי 10.12 · 13:30 שעון יפן",html:()=>`
   <div><div class="big">13:30</div><div class="sub">06:30 בבוקר בישראל</div></div>
   <div>נוחתים ב${T("narita")}, ${T("t1")}.</div>
+  ${qrBox()}
   ${chk("land",[
    "ביקורת גבולות (Immigration) ומכס (Customs): מראים את קודי ה־QR",
    "להפעיל את ה־eSIM",
@@ -595,6 +597,10 @@ const STEPS=[
   </dl>`}
 ];
 
+const QRS=[["barak","ברק","https://drive.google.com/file/d/1AgxEzRu91km1HvsMsf5x671hresGA0fr/view"],["amit","עמית","https://drive.google.com/file/d/1boIlaf3EU4ZaDT0UnGZ_J25mdeQoYWt-/view"]];
+function qrBox(){return `<div class="qrbox"><div class="qrh">קודי QR לכניסה (Visit Japan Web)</div><div class="qrgrid">${QRS.map(([k,n,u])=>{let d=null;try{d=localStorage.getItem("jp26:qr-"+k)}catch(e){}return `<div class="qrcell"><div class="qrn">${n}</div>${d?`<img src="${d}" class="qrimg" data-qrfull="${k}" alt="QR ${n}">`:`<label class="show qrload">לטעון מהגלריה<input type="file" accept="image/*" data-qrin="${k}" hidden></label>`}<a href="${u}" target="_blank" rel="noopener">לפתוח בדרייב</a>${d?`<button class="qrdel" data-qrdel="${k}">להחליף</button>`:""}</div>`}).join("")}</div><div class="sub">התמונה נשמרת רק בטלפון הזה, לא באתר. לחיצה על הקוד מגדילה אותו למסך מלא.</div></div>`}
+document.addEventListener("change",e=>{const i=e.target.closest("[data-qrin]");if(!i||!i.files[0])return;const k=i.dataset.qrin,f=i.files[0],img=new Image(),url=URL.createObjectURL(f);img.onload=()=>{const m=900,sc=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=img.width*sc;c.height=img.height*sc;c.getContext("2d").drawImage(img,0,0,c.width,c.height);try{localStorage.setItem("jp26:qr-"+k,c.toDataURL("image/png"));toast2("נשמר בטלפון")}catch(err){toast2("לא הצלחתי לשמור")}URL.revokeObjectURL(url);render()};img.src=url});
+document.addEventListener("click",e=>{const d=e.target.closest("[data-qrdel]");if(d){try{localStorage.removeItem("jp26:qr-"+d.dataset.qrdel)}catch(err){}render();return}const f=e.target.closest("[data-qrfull]");if(f){const o=document.createElement("div");o.className="qrfull";o.innerHTML=`<img src="${f.src}">`;o.onclick=()=>o.remove();document.body.appendChild(o)}});
 const store={get(k,d){try{const v=localStorage.getItem("jp26:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("jp26:"+k,JSON.stringify(v))}catch(e){}},
   clear(){try{Object.keys(localStorage).filter(k=>k.startsWith("jp26:")).forEach(k=>localStorage.removeItem(k))}catch(e){}}};
 const mem={}; // fallback when storage is unavailable
