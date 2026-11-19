@@ -1,5 +1,5 @@
-const C="japan-v43";
-self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(["./","index.html","manifest.json","icon.svg","icon-192.png","icon-512.png"])))});
+const C="japan-v44";
+self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(["./","index.html","manifest.json","icon.svg","icon-192.png","icon-512.png","qr-barak.png","qr-amit.png"])))});
 self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));
 // network first, so every push shows up right away; cache when offline (e.g. on the plane)
 self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;
