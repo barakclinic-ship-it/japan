@@ -207,6 +207,7 @@ dl.paidlist dd{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
 a{color:#1a5fb4!important;font-weight:600!important;text-decoration:underline;text-underline-offset:3px}
 .applinks{font-size:15.5px}
 .qrbox{border:1px solid #e3e3e3;border-radius:12px;padding:12px;margin:10px 0}.qrh{font-weight:700;margin-bottom:8px}.qrgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.qrcell{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}.qrn{font-weight:700}.qrimg{width:100%;max-width:220px;border-radius:8px;cursor:zoom-in}.qrload{cursor:pointer}.qrdel{background:none;border:0;color:#888;font-size:.85em;text-decoration:underline}.qrfull{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px}.qrfull img{max-width:100%;max-height:100%}
+.subin{display:block;width:100%;margin-top:6px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit;background:#fff}
 </style>
 </head>
 <body>
@@ -462,6 +463,10 @@ const STEPS=[
   ${chkK([
    ["prep-13","מתאם חשמל לשקע אמריקאי שטוח (Type A)"],
    ["prep-15","המצגות ב־PowerPoint על דיסק און קי"]])}
+  <h3>מחליפים בדוג׳ו</h3>
+  <div class="sub">שנינו ביפן 9–24.12. לפי יומן הדוג׳ו, האימונים שצריך להם מחליף. לכתוב שם ולסמן כשמאושר.</div>
+  ${chkK(SUBS.map(([k,d,t])=>[k,[d,`<span class="dur">${t}</span><input class="subin" data-sub="${k}" placeholder="שם המחליף" value="${subv(k)}">`]]))}
+  <div class="msgbox" id="msgSubs">${subsMsg()}</div><button class="show" data-copy="msgSubs">להעתיק הודעה לקבוצת הדוג׳ו</button>
   <h3>עדכונים לפני הנסיעה</h3>
   ${chkK([
    ["msg-ron",["לעדכן את רון בוואטסאפ: לא אהיה בפלוומושן בקיר בימי ראשון 6.12, 13.12 ו־20.12","<div class='msgbox' id='msgRon'>היי רון, רק מעדכן לגבי פלוומושן בקיר:\nלא אהיה בימי ראשון 6.12, 13.12 ו־20.12.\nחוזר ב־27.12 🙏</div><button class='show' data-copy='msgRon'>להעתיק את ההודעה</button>"]]])}
@@ -597,6 +602,10 @@ const STEPS=[
   </dl>`}
 ];
 
+const SUBS=[["sub-0912","רביעי 9.12 · קראטה בוגרים","19:15–20:45 · אנחנו בטיסה"],["sub-1012","חמישי 10.12 · פלומושן","19:15"],["sub-1412","שני 14.12 · קראטה בוגרים","19:15–20:45 · ⚠️ ביומן מתוכננות גם בחינות קיו באותו ערב: לדחות או למצוא בוחן"],["sub-1612","רביעי 16.12 · קראטה בוגרים","19:15–20:45"],["sub-1712","חמישי 17.12 · פלומושן","19:15"],["sub-2112","שני 21.12 · קראטה בוגרים","19:15–20:45"],["sub-2312","רביעי 23.12 · קראטה בוגרים","19:15–20:45"],["sub-2412","חמישי 24.12 · פלומושן","19:15 · אנחנו בטיסה הביתה"]];
+function subv(k){try{return (localStorage.getItem("jp26:"+k)||"").replace(/"/g,"&quot;")}catch(e){return ""}}
+function subsMsg(){return "היי לכולם 🙏\nברק ועמית ביפן 9–24.12. האימונים בזמן הזה:\n"+SUBS.map(([k,d])=>{let v="";try{v=localStorage.getItem("jp26:"+k)||""}catch(e){}return "• "+d+": "+(v||"יעודכן")}).join("\n")+"\nנתראה ב־28.12 🥋"}
+document.addEventListener("input",e=>{const i=e.target.closest("[data-sub]");if(!i)return;try{localStorage.setItem("jp26:"+i.dataset.sub,i.value.trim())}catch(err){}const m=document.getElementById("msgSubs");if(m)m.textContent=subsMsg()});
 const QRS=[["barak","ברק","https://drive.google.com/file/d/1AgxEzRu91km1HvsMsf5x671hresGA0fr/view","https://drive.google.com/file/d/18wPAfUUlffbaTOtcX4OUWs64YNhCt5bX/view"],["amit","עמית","https://drive.google.com/file/d/1boIlaf3EU4ZaDT0UnGZ_J25mdeQoYWt-/view","https://drive.google.com/file/d/1s-pRqLK1_pXu7QORVbxz2fLln3uTaHxv/view"]];
 function qrBox(){return `<div class="qrbox"><div class="qrh">קודי QR לכניסה (Visit Japan Web)</div><div class="qrgrid">${QRS.map(([k,n,u,pf])=>{let d=null;try{d=localStorage.getItem("jp26:qr-"+k)}catch(e){}return `<div class="qrcell"><div class="qrn">${n}</div>${d?`<img src="${d}" class="qrimg" data-qrfull="${k}" alt="QR ${n}">`:`<label class="show qrload">לטעון מהגלריה<input type="file" accept="image/*" data-qrin="${k}" hidden></label>`}<a href="${u}" target="_blank" rel="noopener">לפתוח בדרייב</a><a href="${pf}" target="_blank" rel="noopener">כל הפרטים (PDF)</a>${d?`<button class="qrdel" data-qrdel="${k}">להחליף</button>`:""}</div>`}).join("")}</div><div class="sub">התמונה נשמרת רק בטלפון הזה, לא באתר. לחיצה על הקוד מגדילה אותו למסך מלא.</div></div>`}
 document.addEventListener("change",e=>{const i=e.target.closest("[data-qrin]");if(!i||!i.files[0])return;const k=i.dataset.qrin,f=i.files[0],img=new Image(),url=URL.createObjectURL(f);img.onload=()=>{const m=900,sc=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=img.width*sc;c.height=img.height*sc;c.getContext("2d").drawImage(img,0,0,c.width,c.height);try{localStorage.setItem("jp26:qr-"+k,c.toDataURL("image/png"));toast2("נשמר בטלפון")}catch(err){toast2("לא הצלחתי לשמור")}URL.revokeObjectURL(url);render()};img.src=url});
